@@ -1,0 +1,56 @@
+@startuml
+skinparam monochrome true
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+
+skinparam classAttributeIconSize 0
+
+hide circle
+hide methods
+
+
+
+
+class Client{
+    id
+    name
+    phoneNumber
+    email
+}
+
+class "Unregistered User" as UU {}
+
+class Announcement{
+id
+listingDate
+comission
+requestPrice
+}
+
+
+class Property{
+propertyID
+type
+location
+area
+distanceCenter
+propertyDescription
+photograph
+}
+
+
+
+UU "1" - "1"  Client : can become >
+UU "1" -- "*" Announcement : displays >
+
+Client "1" -- "*" Announcement : purchase >
+Property "1" -left- "1" Announcement: is the physical part of >
+
+
+
+
+
+
+
+@enduml

@@ -1,0 +1,96 @@
+@startuml
+skinparam monochrome true
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+
+skinparam classAttributeIconSize 0
+
+hide circle
+hide methods
+
+title Domain Model US004 - Submit a request for listing a property sale or rent
+
+
+class Agent {
+    agency
+}
+
+class Employee{
+    id
+    name
+    phoneNumber
+    email
+    civilNumber
+    taxNumber
+    password
+}
+
+class Owner {
+    name
+    email
+    phoneNumber
+    civilNumber
+}
+
+class Announcement{
+id
+listingDate
+comission
+requestPrice
+}
+
+class Property{
+propertyID
+type
+location
+area
+distanceCenter
+propertyDescription
+photograph
+}
+
+class Land{}
+
+class Apartment{
+numberBedrooms
+numberBath
+numberParking
+equipment
+}
+
+class House{
+numberBedrooms
+numberBath
+numberParking
+equipment
+basement
+loft
+sunExposure
+}
+
+class Request{
+propertyDescription
+RequestPrice
+RequestAgent
+
+}
+
+
+Agent "1" -- "*" Announcement : publish >
+Property "1" -left- "1" Announcement : is a physical part of >
+Owner "1" -- "1" Property: own >
+Owner "1" -- "1" Request : submits >
+Request "1" -right- "1" Agent : is reviewed by >
+
+
+Property <|-- Land
+Property <|-- Apartment
+Property <|-- House
+
+Employee <|-- Agent
+
+
+
+
+@enduml

@@ -1,0 +1,107 @@
+@startuml
+skinparam monochrome true
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+autonumber
+
+'hide footbox
+actor "Network Manager" as client
+participant ":DivideSetOfAllStores" as UI
+
+participant ":DivideSetOfAllStoresController" as CTRL
+participant ":Repositories" as REPO
+participant "repositories:\nRepositories" as rep
+participant ":AgencyRepository" as agencyRep
+participant "announcementRepository:\nAnnouncementRepository" as AnnouncementRepo
+participant "Announcement" as announ
+participant ":Agency" as agency
+participant "BruteForceAlgorithm" as bruteForceAlgorithm
+
+activate client
+
+    client -> UI : ask to search for properties
+    activate UI
+        UI -> CTRL**:create
+        activate CTRL
+        UI -> CTRL : getNrProperitesForEachAgency()
+    deactivate UI
+
+        CTRL -> REPO : getInstance()
+        activate REPO
+        REPO -> CTRL : instance
+        deactivate REPO
+        CTRL -> rep : getAgencyRepository()
+        activate rep
+        rep -> CTRL : agencyRepository
+        deactivate rep
+
+        CTRL -> agencyRep : getAgencyList()
+        activate agencyRep
+        agencyRep -> CTRL : agencyList
+        deactivate agencyRep
+        CTRL -> REPO : getInstance()
+        activate REPO
+        REPO -> CTRL : instance
+        deactivate REPO
+        CTRL -> rep : getAnnouncementRepository()
+        activate rep
+        rep -> CTRL : announcementRepository
+        deactivate rep
+        loop for each Agency of agencyList
+                     CTRL -> announcementRepository : getNrPropertiesOfAnAgency(Agency)
+                     activate announcementRepository
+                     announcementRepository -> announcementRepository : count = 0
+                     deactivate CTRL
+                     loop for each AnnouncementAvailable in list
+                     announcementRepository -> announ :  getAgent()
+                     activate announ
+                     announ -> announcementRepository : Agent
+                     deactivate announ
+                     announcementRepository -> agency : searchAgent(Agent))
+                     activate agency
+                     agency -> announcementRepository : true/false
+                     deactivate agency
+
+                     opt true
+                     announcementRepository-> announcementRepository : count++
+                     end
+                     end
+                     announcementRepository -> CTRL : count
+                     deactivate announcementRepository
+                     activate CTRL
+
+                     CTRL -> agency : getName()
+                     activate agency
+                     agency -> CTRL : agencyName
+                     deactivate agency
+                     CTRL -> CTRL : fillArrayLine(agencyName,count)
+                     end
+
+                     CTRL -> bruteForceAlgorithm : getPartitions(arrayFilled)
+                     activate bruteForceAlgorithm
+                     bruteForceAlgorithm -> bruteForceAlgorithm : getPartitions(arrayFilled)
+
+                     deactivate CTRL
+                    note right of bruteForceAlgorithm: This method of bruteForceAlgorithm beyond doing the Math part also prints the final information for the user
+
+                    bruteForceAlgorithm -> CTRL : information print
+                       deactivate bruteForceAlgorithm
+                       activate CTRL
+                       CTRL -> UI : information print
+                       activate UI
+                       deactivate CTRL
+                       UI -> client : information print
+
+
+
+
+
+
+
+
+
+
+
+
+@enduml

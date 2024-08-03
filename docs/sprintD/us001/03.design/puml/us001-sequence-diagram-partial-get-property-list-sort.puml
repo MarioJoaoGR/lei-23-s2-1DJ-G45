@@ -1,0 +1,60 @@
+@startuml
+skinparam monochrome true
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+
+
+
+
+participant ":ListingController" as CTRL
+participant ":Repositories" as REPO
+participant "repositories:\nRepositories" as rep
+
+participant "announcementRepository:\nAnnouncementRepository" as AnnouncementRepo
+
+
+
+
+autonumber 27
+-> CTRL: getPropertyList()
+
+alt type==priceAsc
+
+            activate CTRL
+            CTRL-> AnnouncementRepo:  sortByPriceAsc(propertyList)
+                activate AnnouncementRepo
+
+                    AnnouncementRepo --> CTRL: PropertyListOrdered
+                    deactivate
+
+            else type==priceDesc
+
+                CTRL-> AnnouncementRepo:  sortByPriceDesc(propertyList)
+                    activate AnnouncementRepo
+
+                        AnnouncementRepo --> CTRL: PropertyListOrdered
+                        deactivate
+
+
+                else type==parish
+
+                    CTRL-> AnnouncementRepo:  sortByParish(propertyList)
+                        activate AnnouncementRepo
+
+                            AnnouncementRepo --> CTRL: PropertyListOrdered
+                            deactivate
+
+                   else type==recent
+
+                   CTRL-> AnnouncementRepo:  sortByRecent(propertyList)
+                       activate AnnouncementRepo
+
+                           AnnouncementRepo --> CTRL: PropertyListOrdered
+                           deactivate
+
+        end
+
+         <-- CTRL: PropertyListOrdered
+
+@enduml

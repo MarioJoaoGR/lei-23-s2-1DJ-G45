@@ -1,0 +1,360 @@
+@startuml
+skinparam monochrome true
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+autonumber
+
+'hide footbox
+actor "Client" as client
+participant ":SearchUI" as UI
+participant ":AnnouncementController" as CTRL
+participant ":Repositories" as REPO
+participant "repositories:\nRepositories" as rep
+participant "announcementRepository:\nAnnouncementRepository" as AnnouncementRepo
+participant "ApplicationSession" as appSession
+participant "appSession:\nApplicationSession" as app
+participant "currentSession:\nUserSession" as session
+participant "announcementAvailable:\nAnnouncementAvailable" as Announcement
+participant "order:\nOrder" as order
+
+participant "property:\nProperty" as prop
+participant "land:\nLand" as land
+participant "apartment:\nApartment" as apart
+participant "house:\nHouse" as house
+
+
+participant "announcementMapper\n:AnnouncementMapper" as announcementMapper
+participant "orderMapper:\nOrderMapper" as orderMapper
+
+participant "ListAnnouncementAvailable\n:List<AnnouncementAvailable" as List
+participant "ListAnnouncementAvailableDTO\n:List<AnnouncementAvailableDTO" as ListDTO
+
+participant "announcementDTO\n:AnnouncementDTO" as announcementDTO
+
+activate client
+
+    client -> UI : ask to search for properties
+    activate UI
+        UI -> CTRL**:create
+
+    UI --> client: shows the list of types of business
+    deactivate
+
+    client -> UI : choose one type of business
+
+    activate UI
+
+    UI --> client: shows the list of types of property
+    deactivate UI
+
+    client -> UI : choose one type of property
+    activate UI
+
+    alt Property type != Land
+        UI --> client: asks for number of rooms
+        deactivate UI
+
+        client -> UI : choose one type of business
+        activate UI
+    end
+
+UI -> CTRL : getAnnouncementList (business, type, rooms)
+            activate CTRL
+
+                CTRL -> REPO: getInstance()
+                  activate REPO
+
+                REPO --> CTRL : Repositories
+                deactivate REPO
+
+                CTRL -> rep: getAnnouncementRepository()
+                            activate rep
+
+                rep --> CTRL : AnnouncementRepository
+                deactivate rep
+
+                CTRL -> AnnouncementRepo: getAnnouncementList (business, type, rooms)
+                activate AnnouncementRepo
+
+
+
+                         AnnouncementRepo -> Announcement: filterAnnouncementsAvailable(business,type,rooms)
+
+                         activate Announcement
+
+
+                         Announcement->List**:create()
+
+                         loop foreach AnnouncementAvailable
+
+                             Announcement -> Announcement : isAnnouncementBusiness(business)
+
+                            Announcement -> prop : isType(type)
+
+
+                            activate prop
+
+                            prop --> Announcement : true/false
+
+                            deactivate
+
+                            alt type=apartment
+
+                                Announcement -> apart : numberRooms(rooms)
+                                activate apart
+
+                                apart --> Announcement : true/false
+
+                                deactivate apart
+                                else type=house
+                                    Announcement -> house : numberRooms(rooms)
+                                    activate house
+
+                                    house --> Announcement : true/false
+
+                                    deactivate house
+                            end
+
+                            alt isAnnouncementBusiness && isType && numberRooms
+                                Announcement-> List: add(Announcement)
+                            end
+
+                            end
+
+                            Announcement --> AnnouncementRepo : ListAnnouncementAvailable
+                            deactivate Announcement
+
+                            AnnouncementRepo --> CTRL : ListAnnouncementAvailable
+                            deactivate AnnouncementRepo
+
+
+
+                           CTRL -> announcementMapper:toDto(ListAnnouncementAvailable)
+                            activate announcementMapper
+
+                                announcementMapper->ListDTO**:createDTO
+                                loop foreach object of the List
+                                announcementMapper -> List : get(i)
+                                activate List
+                                List --> announcementMapper : AnnouncementAvailable
+                                deactivate List
+
+                                announcementMapper -> announcementMapper : toDto(AnnouncementAvailable)
+                                activate announcementMapper
+                                announcementMapper-> announcementDTO** : create(AnnouncementAvailable)
+                                deactivate
+                                announcementMapper --> ListDTO : add(AnnouncementDTO)
+                                activate ListDTO
+                                deactivate
+
+                                end
+
+
+
+                                announcementMapper --> CTRL : ListAnnouncementDTO
+                            deactivate
+                         deactivate Announcement
+
+
+                deactivate AnnouncementRepo
+
+
+            CTRL --> UI : ListAnnouncementDTO
+            deactivate CTRL
+
+
+
+    UI --> client: shows the list of properties
+    deactivate UI
+
+
+    opt ask to order the list
+
+    client -> UI : ask to order the property list
+    activate UI
+
+    UI --> client : shows a list with types of sort
+    deactivate UI
+
+
+    client -> UI: selects a type of sort
+    activate UI
+
+        UI -> CTRL: getAnnouncementListOrdered(type)
+
+
+            activate CTRL
+
+                alt Sort type == ascending price
+
+                CTRL-> ListDTO:  sortByPriceAsc()
+                activate ListDTO
+
+                    ListDTO --> CTRL: AnnouncementListOrderedDTO
+                    deactivate
+
+                else Sort type == descending price
+
+                        CTRL-> ListDTO:  sortByPriceDesc()
+                                    activate ListDTO
+
+                    ListDTO --> CTRL: AnnouncementListOrderedDTO
+                    deactivate
+                 else Sort type == parish
+
+                    CTRL-> ListDTO:  sortByParish()
+                    activate ListDTO
+
+                        ListDTO --> CTRL: AnnouncementListOrderedDTO
+                        deactivate
+
+                else Sort type == recent date
+                    CTRL-> ListDTO:  sortByRecent()
+                    activate ListDTO
+
+                        ListDTO --> CTRL: AnnouncementListOrderedDTO
+                        deactivate
+
+
+
+
+    end
+
+            CTRL-->UI:AnnouncementListOrderedDTO
+    deactivate
+
+    UI --> client: shows the AnnouncementList Sorted
+    deactivate
+
+    end
+    client -> UI : Selects a property
+    activate UI
+
+        UI-> CTRL: getAnnouncementById(id)
+            activate CTRL
+
+            CTRL -> ListDTO : getAnnouncementById(id)
+            activate ListDTO
+                loop for each announcement
+
+                     ListDTO -> announcementDTO: isAnnouncementId(id)
+                     activate announcementDTO
+
+                     announcementDTO --> ListDTO: true/false
+
+                     deactivate
+                     alt true
+                     ListDTO-->CTRL : AnnouncementDTO
+                     deactivate
+
+                     end
+                 end
+
+
+
+
+
+
+
+        CTRL--> UI :AnnouncementDTO
+                    deactivate
+
+    UI --> client: shows the property chosed with all information \n and option to submit an order
+    deactivate UI
+
+    client -> UI : Choose the option to submit an order
+    activate UI
+
+    UI --> client: request an order price
+    deactivate UI
+
+    client -> UI : Types the price and submit
+        activate UI
+
+    UI->CTRL: createOrder(announcementDTO,value,date)
+
+            activate CTRL
+                CTRL -> CTRL : getClientFromSession()
+                activate CTRL
+                CTRL->appSession: getInstance()
+                activate appSession
+                appSession-->CTRL : appSession
+                deactivate
+
+                CTRL->app: getCurrentSession()
+                activate app
+                app-->CTRL : currentSession
+                deactivate
+
+                CTRL->session: getClientEmail()
+                activate session
+                session-->CTRL : email
+                    deactivate session
+                    CTRL -> CTRL : email
+                deactivate CTRL
+
+                CTRL-> announcementMapper: fromDTO(AnnouncementDTO)
+                activate announcementMapper
+                announcementMapper--> CTRL : announcementAvailable
+                deactivate
+                CTRL -> Announcement : validateOrder(value)
+                activate Announcement
+                    Announcement -> Announcement: isValueHigherThanPrice()
+                    Announcement -> Announcement: isAnotherOrderByClient()
+                    Announcement -> Announcement: isAnotherOrderWithSameValue()
+
+
+
+                alt isValueHigherThanPrice()==true
+                    Announcement --> CTRL: insucess message
+
+                    CTRL-->UI:insucess message
+                    UI-->client:insucess message
+                else isAnotherOrderByClient()==true
+                    Announcement --> CTRL: insucess message
+
+                    CTRL-->UI:insucess message
+                    UI-->client:insucess message
+
+
+                else isAnotherOrderWithSameValue()==true
+                    Announcement --> CTRL: shows a insucess message and the order that already exist
+                    deactivate
+
+                    CTRL-->UI:shows a insucess message and the order that \n already exist
+                    UI-->client:shows a insucess message and the order that \n already exist
+
+                end
+
+
+
+
+                CTRL-> order** : create(email,value)
+                CTRL-> Announcement: createOrder(announcementAvailable,Order)
+
+                activate Announcement
+
+                 Announcement -> Announcement : addOrder(order)
+                 activate Announcement
+
+                 deactivate Announcement
+
+                Announcement --> CTRL: success message
+
+                deactivate Announcement
+
+            CTRL-->UI: success message
+            deactivate CTRL
+        UI --> client : shows a sucess message
+
+    deactivate
+
+
+
+
+
+
+
+
+@enduml

@@ -1,0 +1,36 @@
+@startuml
+'skinparam monochrome true
+skinparam packageStyle rectangle
+'skinparam shadowing false
+
+
+
+'title Use Case Diagram Example
+
+left to right direction
+
+actor "Unregistered User" as user
+actor Agent
+actor "System administrtor" as admin
+actor Owner
+
+
+rectangle System{
+usecase "US 001 - Display listed properties" as US001
+usecase "US 002 - Publish Sale" as US002
+usecase "US 003 - Register a new employee" as US003
+usecase "US 004 - Submit a request for listing a \nproperty sale or rent" as US004
+usecase "US 005 - Register a store" as US005
+usecase "US 007 - Register in the system" as US007
+}
+
+
+
+user -- US001
+Agent -- US002
+admin -- US003
+Owner -- US004
+admin -- US005
+user -- US007
+
+@enduml

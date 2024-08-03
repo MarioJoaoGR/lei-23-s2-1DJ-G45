@@ -1,0 +1,55 @@
+@startuml
+skinparam monochrome true
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+title US010 - System Sequence Diagram (SSD)
+autonumber
+
+actor "Agent" as agent
+participant ":System" as System
+
+activate agent
+
+    agent -> System : wants to list real estate purchase orders to accept or decline a purchase order for a property
+    activate System
+
+    System --> agent: shows the list of properties sorted by the oldest to the most recent one and asks to select \nbetween the announcements available
+    deactivate
+
+    agent -> System : selects the announcement in wich he/she wants to list the real estate purchase orders
+    activate System
+
+    System --> agent: shows the list of purchase orders sorted by the highest to the lower offer amount and asks to\n select one of the displayed options
+    deactivate System
+
+    agent -> System : selects a purchase order
+    activate System
+
+
+
+    opt asks to accept or decline the chosen order
+
+
+
+    alt AcceptOrder = true
+        agent -> System : Accepts order
+        System -> agent: shows operation success message and automatically declines all other purchase orders
+
+        else AcceptOrder = false
+         agent -> System : Declines order
+            System -> agent: declines purchase order and shows the order list without the already declined orders until one is accepted
+
+    end
+
+
+    end
+
+    activate System
+
+    System --> agent:notificates clients via email with the respective results about the contest
+    deactivate System
+
+
+
+@enduml

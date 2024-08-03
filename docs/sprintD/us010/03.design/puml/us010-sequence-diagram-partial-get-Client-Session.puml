@@ -1,0 +1,44 @@
+@startuml
+skinparam monochrome true
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+participant ":AnnouncementController" as CTRL
+
+participant ":AnnouncementController" as CTRL
+
+participant "ApplicationSession" as appSession
+participant "appSession:\nApplicationSession" as app
+participant "currentSession:\nUserSession" as session
+
+autonumber 25
+
+ ->CTRL: createOrder(announcementDTO,value,date)
+autonumber 25.1
+
+             activate CTRL
+                 CTRL -> CTRL : getClientFromSession()
+                 activate CTRL
+                 CTRL->appSession: getInstance()
+                 activate appSession
+                 appSession-->CTRL : appSession
+                 deactivate
+
+                 CTRL->app: getCurrentSession()
+                 activate app
+                 app-->CTRL : currentSession
+                 deactivate
+
+                 CTRL->session: getClientEmail()
+                 activate session
+                 session-->CTRL : email
+                     deactivate session
+                     CTRL -> CTRL : email
+                 deactivate CTRL
+
+
+
+autonumber 16
+
+
+@enduml

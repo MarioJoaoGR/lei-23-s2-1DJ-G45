@@ -1,0 +1,101 @@
+@startuml
+skinparam monochrome true
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+autonumber
+
+actor "Admin" as admin
+participant ":ImportFileUI" as UI
+participant ":ImportController" as CTRL
+participant "ExternalModuleAdapterCSV" as adapter
+participant "List<ExternalModuleCSV>" as List
+participant "ExternalModuleCSV" as externalModule
+participant "announcementSold\n:AnnouncementSold" as announcement
+participant ":AnnouncementController" as annCTRL
+participant "announcementRepository\n:AnnouncementRepository" as repo
+
+
+activate admin
+
+    admin -> UI : asks to import a legacy file
+    activate UI
+
+
+        UI -> CTRL:JFileChooser()
+        activate CTRL
+
+        CTRL-> UI: menu
+        deactivate
+
+
+
+    UI --> admin: shows the menu to choose a file from local machine
+    deactivate UI
+
+    admin -> UI : Selects a file and submit
+    activate UI
+
+         UI -> CTRL: addLegacyFile(file,filePath)
+                activate CTRL
+                CTRL->CTRL:validateCSV(file)
+
+                alt validateCSV(file)==true
+                CTRL-->UI:insuccess message
+                UI --> admin : shows an insuccess message\n and the error message
+
+                end
+                CTRL->CTRL:validateEmpty(file)
+
+                alt validateEmpty(file)==true
+                CTRL-->UI:insuccess message
+                UI --> admin : shows an insuccess message\n and the error message
+
+                end
+
+                CTRL-> adapter : readFile(filePath)
+                    activate adapter
+                    adapter-> List** : create()
+                    loop foreach line of csv file
+                    adapter-> externalModule** : create()
+                    adapter -> List: add(externalModule)
+                    end
+
+                    loop for each element of List<ExternalModuleCSV>
+                        adapter -> externalModule: getAnnouncement()
+                        activate externalModule
+
+                        externalModule -> announcement**:create()
+
+                        externalModule--> adapter : AnnouncementSold
+
+                        deactivate
+                        adapter -> adapter: add(AnnouncementSold)
+                        activate adapter
+                        adapter-> annCTRL:addAnnouncementSold(AnnouncementSold)
+                        activate annCTRL
+
+                            annCTRL->repo:addSold(AnnouncementSold)
+                        deactivate
+
+                        deactivate adapter
+
+                    end
+                    adapter -> CTRL: succes
+
+
+                    deactivate
+                CTRL-> UI: success
+                deactivate
+        UI --> admin : shows a success message
+
+
+                   UI --> admin : shows an insuccess message\n and the error message
+
+
+
+    deactivate
+
+
+
+@enduml

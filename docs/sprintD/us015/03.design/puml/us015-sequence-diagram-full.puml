@@ -1,0 +1,171 @@
+@startuml
+skinparam monochrome true
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+autonumber
+
+actor "Agent" as agent
+participant ": ListVisitRequestUI" as UI
+participant ": AnnouncementController" as CTRL
+participant ":AnnouncementController" as CTRL
+participant ":Repositories" as REPO
+participant "repositories:\nRepositories" as rep
+participant "announcementRepository:\nAnnouncementRepository" as AnnouncementRepo
+participant "ApplicationSession" as appSession
+participant "appSession:\nApplicationSession" as app
+participant "currentSession:\nUserSession" as session
+participant "announcementAvailable:\nAnnouncementAvailable" as Announcement
+participant "visitRequestMapper:\nvisitRequestMapper" as mapper
+
+participant "visitRequest:\nvisitRequest" as visitRequest
+participant "agent:\nAgent" as Agent
+
+
+participant "listOfRequests:\nList<VisitRequest>" as List
+participant "listOfRequestsDTO:\nList<VisitRequestDTO>" as ListDTO
+participant "VisitRequestDTO:\nVisitRequestDTO" as DTO
+
+
+
+
+activate agent
+agent -> UI : asks to list all booking requests for properties
+activate UI
+UI->CTRL**:create()
+UI--> agent: requests a beginning date
+deactivate
+
+agent->UI: select a beginning date
+activate UI
+
+UI-->agent: requests an ending date
+deactivate
+agent->UI: select a ending date
+
+activate UI
+    UI -> CTRL : getVisitRequestListForAgent (startDate,endDate)
+                activate CTRL
+                    CTRL -> CTRL : getClientFromSession()
+                                    activate CTRL
+                                    CTRL->appSession: getInstance()
+                                    activate appSession
+                                    appSession-->CTRL : appSession
+                                    deactivate
+
+                                    CTRL->app: getCurrentSession()
+                                    activate app
+                                    app-->CTRL : currentSession
+                                    deactivate
+
+                                    CTRL->session: getClientEmail()
+                                    activate session
+                                    session-->CTRL : email
+                                        deactivate session
+                                        CTRL -> CTRL : email
+                                    deactivate CTRL
+
+                    CTRL -> REPO: getInstance()
+                      activate REPO
+
+                    REPO --> CTRL : Repositories
+                    deactivate REPO
+
+                    CTRL -> rep: getAnnouncementRepository()
+                                activate rep
+
+                    rep --> CTRL : AnnouncementRepository
+                    deactivate rep
+
+                    CTRL -> AnnouncementRepo: getVisitRequestListForAgent (email,startDate,endDate)
+                    activate AnnouncementRepo
+
+                             AnnouncementRepo->List**:create()
+                              loop foreach AnnouncementAvailable
+
+                             AnnouncementRepo -> Announcement: getVisitRequestForAgent (email,startDate,endDate)
+
+                             activate Announcement
+
+
+
+
+                                 Announcement -> Agent : isAgent(email)
+                                 activate Agent
+                                 Agent --> Announcement: true/false
+                                 deactivate
+                                 alt isResponsibleAgent(email) = true
+
+                                 Announcement -> visitRequest : isDateBetween(startDate,endDate)
+
+                                 activate visitRequest
+                                  visitRequest -> visitRequest : isStateWaiting()
+
+                                    alt isDateBetween(startDate,endDate) = true and isStateWaiting = true
+                                    visitRequest-->Announcement: visitRequest
+                                    deactivate
+                                    Announcement --> AnnouncementRepo : visitRequest
+                                    deactivate Announcement
+
+                                    AnnouncementRepo->List:addVisitRequest()
+                                    activate List
+                                    deactivate
+                                    end
+
+                                end
+                                end
+
+
+
+                                AnnouncementRepo -> AnnouncementRepo : sortByRecent(ListOfRequests)
+
+                                AnnouncementRepo --> CTRL : ListOfRequests
+                                deactivate AnnouncementRepo
+
+
+
+                               CTRL -> mapper:toDto(ListOfRequests)
+                                activate mapper
+
+                                    mapper->ListDTO**:createDTO
+                                    loop foreach object of the List
+                                    mapper -> List : get(i)
+                                    activate List
+                                    List --> mapper : VisitRequest
+                                    deactivate List
+
+                                    mapper -> mapper : toDto(VisitRequest)
+                                    activate mapper
+                                    mapper-> DTO** : create(VisitRequest)
+                                    deactivate
+                                    mapper --> ListDTO : add(VisitRequestDTO)
+                                    activate ListDTO
+                                    deactivate
+
+                                    end
+
+
+
+                                    mapper --> CTRL : ListOfRequestsDTO
+                                deactivate
+                             deactivate Announcement
+
+
+                    deactivate AnnouncementRepo
+
+
+                CTRL --> UI : ListOfRequestsDTO
+                deactivate CTRL
+
+UI-->agent: Shows the list of booking requests \nsorted by recent
+
+
+
+
+
+
+
+
+
+
+@enduml

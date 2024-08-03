@@ -1,0 +1,40 @@
+@startuml
+skinparam monochrome true
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+participant ":AnnouncementController" as CTRL
+participant "ListAnnouncementAvailableDTO\n:List<AnnouncementAvailableDTO" as ListDTO
+participant "announcementDTO\n:AnnouncementDTO" as announcementDTO
+
+autonumber 19
+-> CTRL: getAnnouncementById(id)
+            activate CTRL
+            autonumber 19.1
+
+            CTRL -> ListDTO : getAnnouncementById(id)
+            activate ListDTO
+                loop for each announcement
+
+                     ListDTO -> announcementDTO: isAnnouncementId(id)
+                     activate announcementDTO
+
+                     announcementDTO --> ListDTO: true/false
+
+                     deactivate
+                     alt true
+                     ListDTO-->CTRL : AnnouncementDTO
+                     deactivate
+
+                     end
+
+                 end
+
+
+
+
+
+
+autonumber 20
+        <--CTRL :AnnouncementDTO
+@enduml

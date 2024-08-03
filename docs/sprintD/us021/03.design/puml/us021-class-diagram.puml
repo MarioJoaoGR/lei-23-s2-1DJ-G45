@@ -1,0 +1,101 @@
+@startuml
+'skinparam monochrome true
+skinparam packageStyle rectangle
+skinparam shadowing false
+skinparam linetype polyline
+'skinparam linetype orto
+
+skinparam classAttributeIconSize 0
+
+'left to right direction
+
+class "RespondsVisitRequestOpinionUI" as UI{
+
+}
+
+class "Repositories" as repo {
+    - Repositories()
+    + getInstance() : Repositories
+    + getAnnouncementRepository()
+}
+
+
+class "RespondsVisitRequestOpinionUI" as UI{}
+
+class "AnnouncementController" as controller{
++getAllVisitRequestListForAgent()
++getClientFromSession()
++getAnnouncementRepository()
++sortComboVisitItemsByDate();
++getClassificationList()
++setVisitRequest(opinion,classification,visitRequest)
++isOpinionLenght
+}
+
+class "ApplicationSession" as appSession{
++getInstance()
++getCurrentSession()
+}
+
+class "UserSession" as session{
+getClientEmail()
+}
+
+
+
+class "AnnouncementRepository" as AnnouncementRepo{
+-List<VisitRequest>
++getVisitRequestListForAgent(email)
+}
+
+class "AnnouncementAvailable" as Announcement{
++getVisitRequestListForAgent(email)
+}
+
+class "Agent" as agent{
++isAgent(email)
+}
+
+class "VisitRequest" as visit{
++isStateWaiting()
++isDateBeforeToday()
++setVisitRequestOpinion(visitRequestOpinion)
+}
+
+class "VisitRequestMapper" as mapper{
+-List<VisitRequestDTO>
++toDto(ListVisitRequest)
++toDto(visitRequest)
+}
+
+
+
+class "VisitRequestDTO" as DTO{}
+
+class "VisitRequestOpinion" as opinion{
++getClassificationList()
+}
+
+
+UI.>controller
+controller.>repo
+controller.>appSession
+appSession-->appSession:instance
+appSession->session:User Session
+controller..>session
+controller..>AnnouncementRepo: AnnouncementRepository
+repo-->AnnouncementRepo
+repo->repo:instance
+AnnouncementRepo"1"-->"*" Announcement : AnnouncementAvailables
+Announcement"1"-->"1"agent : has
+Announcement"1"-->"*"visit : has
+visit"1"-->"1"opinion
+controller...> Announcement
+controller...> opinion
+
+controller...> DTO
+controller.....> mapper
+mapper--> DTO
+ visit->mapper
+ visit...>DTO
+@enduml

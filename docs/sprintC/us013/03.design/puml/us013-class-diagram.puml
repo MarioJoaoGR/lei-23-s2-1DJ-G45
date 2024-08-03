@@ -1,0 +1,70 @@
+@startuml
+
+class NetworkManager {
+  +listEmployeesInEveryStore()
+}
+
+class ListEmployeesUI {
+  +showList(agencyDTOListSort: List<AgencyDTO>)
+}
+
+class ListEmployeeController {
+  +getAgencyListSorted(): List<AgencyDTO>
+}
+
+class repositories {
+  -instance: repositories
+  +getInstance(): repositories
+  +getAgencyRepository(): AgencyRepository
+}
+
+class AgencyRepository {
+  +getAgencyListSorted(): List<Agency>
+  -getAgenciesList(): List<Agency>
+  -sort(agenciesList: List<Agency>)
+  +getListOfEmployees(agency: Agency): List<Employee>
+}
+
+class Agency {
+  // Class members
+}
+
+class ListOfEmployees {
+  // Class members
+}
+
+class AgencyMapper {
+  +toDTO(agencyList: List<Agency>): List<AgencyDTO>
+  -createAgencyDTO(agency: Agency): AgencyDTO
+  -createEmployeeDTO(employee: Employee): EmployeeDTO
+}
+
+class AgencyDTO {
+  -agencyName: String
+  -employees: List<EmployeeDTO>
+  +AgencyDTO(agencyName: String)
+  +addEmployee(employeeDTO: EmployeeDTO)
+}
+
+class EmployeeDTO {
+  // Class members
+}
+
+class Employee {
+  // Class members
+}
+
+NetworkManager --> ListEmployeesUI
+ListEmployeesUI --> ListEmployeeController
+repositories-->repositories
+ListEmployeeController --> repositories
+repositories --> AgencyRepository
+AgencyRepository --> Agency
+AgencyRepository --> ListOfEmployees
+AgencyRepository --> AgencyMapper
+Agency --> ListOfEmployees
+AgencyMapper --> AgencyDTO
+AgencyMapper --> EmployeeDTO
+AgencyDTO --> EmployeeDTO
+
+@enduml

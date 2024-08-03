@@ -1,0 +1,57 @@
+@startuml
+skinparam monochrome true
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+participant ":AnnouncementController" as CTRL
+participant "ListAnnouncementAvailableDTO\n:List<AnnouncementAvailableDTO" as ListDTO
+
+
+autonumber 15
+
+ -> CTRL: getAnnouncementListOrdered(type)
+
+autonumber 15.1
+
+            activate CTRL
+
+                alt Sort type == ascending price
+
+                CTRL-> ListDTO:  sortByPriceAsc()
+                activate ListDTO
+
+                    ListDTO --> CTRL: AnnouncementListOrderedDTO
+                    deactivate
+
+                else Sort type == descending price
+
+                        CTRL-> ListDTO:  sortByPriceDesc()
+                                    activate ListDTO
+
+                    ListDTO --> CTRL: AnnouncementListOrderedDTO
+                    deactivate
+                 else Sort type == parish
+
+                    CTRL-> ListDTO:  sortByParish()
+                    activate ListDTO
+
+                        ListDTO --> CTRL: AnnouncementListOrderedDTO
+                        deactivate
+
+                else Sort type == recent date
+                    CTRL-> ListDTO:  sortByRecent()
+                    activate ListDTO
+
+                        ListDTO --> CTRL: AnnouncementListOrderedDTO
+                        deactivate
+
+
+
+
+    end
+
+autonumber 16
+
+            <--CTRL:AnnouncementListOrderedDTO
+
+@enduml

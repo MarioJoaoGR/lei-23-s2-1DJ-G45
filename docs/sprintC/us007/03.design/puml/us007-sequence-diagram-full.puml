@@ -1,0 +1,89 @@
+@startuml
+skinparam monochrome true
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+autonumber
+
+'hide footbox
+actor "Unregistered user" as UU
+participant ":RegisterUserUI" as UI
+participant ":RegisterUserController" as CTRL
+participant ":Repositories" as RepositorySingleton
+participant "repositories\n:Repositories" as rep
+participant "UserRepository:\nUserRepository" as UserRepository
+participant "User:" as User
+
+
+activate UU
+
+        UU -> UI : asks to register a user
+
+        activate UI
+'
+            UI -> CTRL** : Create
+
+            UI --> UU :requests the data(name,email and password)
+        deactivate UI
+
+    UU -> UI : types the data(name,email and password) and confirm
+    activate UI
+
+    UI->CTRL: RegisterUser(name,email,password)
+    activate CTRL
+
+    CTRL -> RepositorySingleton : getInstance()
+        activate RepositorySingleton
+
+            RepositorySingleton --> CTRL: repositories
+            deactivate RepositorySingleton
+
+            CTRL -> rep : getUserRepository()
+            activate rep
+            rep --> CTRL: UserRepository
+            deactivate
+            CTRL -> UserRepository: isAccountAlredyRegistered(userEmail)
+             activate UserRepository
+            UserRepository->CTRL: true/false
+            deactivate
+
+            CTRL -> UserRepository : addUser(name,email,password)
+
+            activate UserRepository
+
+                            UserRepository -> User**: create(name,email,password)
+                            UserRepository -> UserRepository: addUser (user)
+
+
+                            activate UserRepository
+                                UserRepository -> UserRepository: validateUser(user)
+                             deactivate
+
+                            UserRepository --> CTRL : isUserRegisteredSuccessfully
+
+
+            deactivate
+
+            deactivate UserRepository
+
+
+           alt isUserRegisteredSuccessfully = true
+
+                CTRL -->UI : registrationSuccess()
+                UI->UU : Account successfuly registered in the system
+                else
+                CTRL -->UI : registrationFailed()
+                deactivate CTRL
+                UI->UU : Account already registered in the system
+
+
+           deactivate UI
+
+           end
+
+
+
+
+deactivate UU
+
+@enduml

@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane prefHeight="530.0" prefWidth="705.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="pt.ipp.isep.dei.esoft.project.ui.gui.ListVisitRequestUI">
+   <top>
+      <VBox prefHeight="32.0" prefWidth="705.0" BorderPane.alignment="CENTER">
+         <children>
+            <Separator prefWidth="200.0" />
+              <MenuBar>
+                  <menus>
+                      <Menu fx:id="mnuFile" onShowing="#onShowingFile" mnemonicParsing="false">
+                          <items>
+
+                              <MenuItem fx:id="mnuFileClose" mnemonicParsing="false" onAction="#mnuFileCloseAction" />
+                          </items>
+                      </Menu>
+
+                  </menus>
+              </MenuBar>
+         </children>
+      </VBox>
+   </top>
+   <bottom>
+      <HBox alignment="TOP_RIGHT" prefHeight="26.0" prefWidth="705.0" BorderPane.alignment="CENTER">
+         <children>
+            <Label fx:id="labelEmailFooter" alignment="TOP_LEFT" opacity="0.4" prefHeight="26.0" prefWidth="255.0">
+               <padding>
+                  <Insets left="20.0" />
+               </padding>
+            </Label>
+            <AnchorPane prefHeight="69.0" prefWidth="517.0" />
+            <Label alignment="TOP_RIGHT" opacity="0.4" prefHeight="32.0" prefWidth="107.0" text="Cera" textAlignment="CENTER">
+               <padding>
+                  <Insets right="20.0" />
+               </padding>
+            </Label>
+         </children>
+      </HBox>
+   </bottom>
+   <center>
+      <VBox prefHeight="200.0" prefWidth="100.0" BorderPane.alignment="CENTER">
+         <children>
+            <HBox alignment="CENTER_LEFT" prefHeight="37.0" prefWidth="695.0">
+               <children>
+                  <Label fx:id="lblStartDate" alignment="TOP_LEFT" text="a">
+                     <HBox.margin>
+                        <Insets left="10.0" />
+                     </HBox.margin></Label>
+                  <AnchorPane prefHeight="31.0" prefWidth="84.0" />
+                  <Label fx:id="lblEndDate" alignment="TOP_LEFT" text="a" />
+               </children>
+            </HBox>
+              <ListView fx:id="lstViewTarefas" prefHeight="418.0" prefWidth="695.0">
+               <VBox.margin>
+                  <Insets top="10.0" />
+               </VBox.margin>
+              </ListView>
+         </children>
+         <BorderPane.margin>
+            <Insets bottom="10.0" left="5.0" right="5.0" top="10.0" />
+         </BorderPane.margin>
+      </VBox>
+   </center>
+</BorderPane>

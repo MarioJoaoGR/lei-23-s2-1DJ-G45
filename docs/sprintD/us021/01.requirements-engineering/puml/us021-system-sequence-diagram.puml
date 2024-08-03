@@ -1,0 +1,47 @@
+@startuml
+skinparam monochrome true
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+title US021 - System Sequence Diagram (SSD)
+autonumber
+
+actor "Agent" as actor
+participant ":System" as system
+
+activate actor
+actor -> system : asks to register the visit and the opinion about the business
+
+activate system
+system --> actor: shows a Visit Requests list and asks to select one
+deactivate system
+
+actor -> system : selects a visit request
+
+activate system
+system --> actor: shows a Classification list and asks to select one
+deactivate system
+
+actor -> system : selects a Classification
+
+activate system
+system --> actor: requests a Visit Request Opinion
+deactivate system
+
+actor -> system : types the opinion and submit
+
+
+activate system
+
+alt  opinion text lenght >= 200 and inputs not empty
+
+system --> actor: shows a success message
+else opinion text lenght < 200 or inputs empty
+system --> actor: shows an insuccess message
+
+deactivate
+end
+
+deactivate system
+
+@enduml

@@ -1,0 +1,186 @@
+@startuml
+skinparam monochrome true
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+autonumber
+
+'hide footbox
+actor "Registered User" as user
+participant ":SearchUI" as UI
+participant ":ScheduleVisitController" as CTRL
+participant ":AnnouncementUI"
+participant ":Repositories" as RepositorySingleton
+participant "repositories\n:Repositories" as PLAT
+participant "AuthenticationRepository" as repo1
+participant "AnnouncementDTO" as dto2
+participant "Announcement" as announcement
+
+participant "VisitRequestDTO:" as dto
+participant "VisitRequest" as visitRequest
+/'participant "AgentDTO" as agentDTO
+participant "AgentMapper" as agentMapper'/
+participant "VisitRequestMapper" as mapper
+participant "AuthenticationFacade" as facade
+participant "UserSession" as userS
+
+
+activate user
+        user -> UI : ask to search for properties
+            activate UI
+
+
+                UI -> CTRL**:create
+
+                    UI -> CTRL : getAnnouncementList(business,type, rooms)
+                    activate CTRL
+                        ref over CTRL
+                            Get Announcement list DTO
+                        end
+
+
+
+                    CTRL --> UI : AnnouncementList
+                    deactivate CTRL
+
+            UI --> user: shows the list of properties
+            deactivate UI
+
+            opt ask to order the list
+                user -> UI : ask to order the Announcement list
+                activate UI
+
+                        UI-->user: shows the Announcement of types of sort
+                        deactivate
+                        user->UI:selects a type of sort
+                        activate UI
+
+                        UI -> CTRL: getAnnouncementList()
+                        activate CTRL
+
+                        ref over CTRL
+                            Get Announcement list DTO sorted
+                        end
+
+                        CTRL-->UI:AnnouncementListOrdered
+                        deactivate CTRL
+
+                UI --> user: shows the list of properties ordered
+                deactivate UI
+            end
+
+            user -> UI : Selects an Announcement
+            activate UI
+
+
+                UI-> CTRL: getAnnouncementById(id)
+                    activate CTRL
+
+                        ref over CTRL
+                            Get id from selected Announcement
+                        end
+
+                CTRL--> UI :Announcement
+               deactivate
+            UI --> user: shows the Announcement chosed with all information
+
+
+            user -> UI : asks to schedule a visit for that announcement chosed
+            loop until wants to add more dates with time slots
+            UI -> user : request Date(xx-yy-zzzz)
+            user-> UI : types Date
+            loop while wants to add more time slots
+                UI-> user : request time slots(x hour to y hour format)
+                user -> UI : types x
+                user -> UI : types y
+                end
+            end
+            activate CTRL
+                UI->CTRL : getEmail()
+        deactivate UI
+activate CTRL
+                activate RepositorySingleton
+                CTRL -> RepositorySingleton : getInstance()
+
+                RepositorySingleton -> CTRL : Repositories
+                deactivate RepositorySingleton
+                activate PLAT
+                CTRL -> PLAT : getAuthenticationRepository()
+                PLAT -> CTRL : authenticationRepository
+                deactivate PLAT
+                activate repo1
+
+                CTRL -> repo1 : getAndSetInfo()
+            deactivate CTRL
+            activate userS
+
+               repo1 -> userS : getCurrentUserSession()
+                userS -> repo1 : userSession
+                deactivate userS
+                activate facade
+                repo1 -> facade : getEmail()
+                facade -> repo1 : e-mail
+                deactivate facade
+                activate CTRL
+                    repo1 -> CTRL : e-mail
+                    deactivate repo1
+
+                   activate RepositorySingleton
+                   CTRL -> RepositorySingleton : getInstance()
+                    RepositorySingleton -> CTRL : Repositories
+                     deactivate RepositorySingleton
+                     activate PLAT
+                      CTRL -> PLAT : getAuthenticationRepository()
+                                   PLAT -> CTRL : authenticationRepository
+                   deactivate PLAT
+
+                   CTRL -> repo1 : getName()
+                activate repo1
+                deactivate CTRL
+                    activate userS
+                    repo1 -> userS : getCurrentUserSession()
+                    userS -> repo1 : userSession
+                    deactivate userS
+                    activate facade
+                    repo1 -> facade : getEmail()
+                    facade -> repo1 : email
+                    deactivate facade
+                    activate CTRL
+                        repo1 -> CTRL : name
+                    deactivate repo1
+
+                        activate dto2
+                        CTRL -> dto2 : getAgent()
+                        dto2 -> CTRL : agentDTO
+                        deactivate dto2
+
+                        activate dto
+                         deactivate CTRL
+                            CTRL -> dto : setData(email,name,timeSlotList,date,agentDTO)
+                        deactivate dto
+                    activate CTRL
+
+                deactivate UI
+                activate announcement
+                    CTRL -> announcement : createVisitRequest(VisitRequestDTO)
+                    deactivate CTRL
+                       activate visitRequest
+                        announcement -> visitRequest : create()
+                        visitRequest -> announcement : VisitRequest
+                        deactivate visitRequest
+                        activate CTRL
+                            announcement -> CTRL : VisitRequest
+                            CTRL -> announcement : addVisitRequest(visitRequest)
+                    deactivate CTRL
+                    announcement-> announcement : validateVisitRequests()
+                    activate CTRL
+                        announcement -> CTRL : boolean result
+                deactivate announcement
+                activate UI
+                    CTRL -> UI : boolean result
+                    deactivate CTRL
+                        UI -> user : shows operation success/insuccess
+                deactivate UI
+deactivate user
+
+@enduml

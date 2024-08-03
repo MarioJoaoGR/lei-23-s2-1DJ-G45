@@ -1,0 +1,68 @@
+@startuml
+skinparam monochrome true
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+autonumber
+
+
+participant "announcementRepository:\nAnnouncementRepository" as AnnouncementRepo
+participant "announcementAvailable:\nAnnouncementAvailable" as Announcement
+participant "visitRequest:\nvisitRequest" as visitRequest
+participant "agent:\nAgent" as Agent
+participant "listOfRequests:\nList<VisitRequest>" as List
+
+
+
+
+
+    -> AnnouncementRepo: getVisitRequestListForAgent (email,startDate,endDate)
+    activate AnnouncementRepo
+
+             AnnouncementRepo->List**:create()
+              loop foreach AnnouncementAvailable
+
+             AnnouncementRepo -> Announcement: getVisitRequestForAgent (email,startDate,endDate)
+
+             activate Announcement
+
+
+
+
+                 Announcement -> Agent : isAgent(email)
+                 activate Agent
+                 Agent --> Announcement: true/false
+                 deactivate
+                 alt isResponsibleAgent(email) = true
+
+                 Announcement -> visitRequest : isDateBetween(startDate,endDate)
+
+                 activate visitRequest
+                  visitRequest -> visitRequest : isStateWaiting()
+
+                    alt isDateBetween(startDate,endDate) = true and isStateWaiting = true
+                    visitRequest-->Announcement: visitRequest
+                    deactivate
+                    Announcement --> AnnouncementRepo : visitRequest
+                    deactivate Announcement
+
+                    AnnouncementRepo->List:addVisitRequest()
+                    activate List
+                    deactivate
+                    end
+
+                end
+                end
+
+
+
+                AnnouncementRepo -> AnnouncementRepo : sortByRecent(ListOfRequests)
+
+                <--AnnouncementRepo  : ListOfRequests
+                deactivate AnnouncementRepo
+
+
+
+
+
+@enduml

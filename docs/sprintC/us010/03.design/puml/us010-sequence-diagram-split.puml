@@ -1,0 +1,135 @@
+@startuml
+skinparam monochrome true
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+autonumber
+
+'hide footbox
+actor "Client" as client
+participant ":SearchUI" as UI
+participant ":AnnouncementController" as CTRL
+
+activate client
+
+    client -> UI : ask to search for properties
+    activate UI
+
+        UI -> CTRL**:create
+
+    UI --> client: shows the list of types of business
+    deactivate
+
+    client -> UI : choose one type of business
+
+    activate UI
+
+    UI --> client: shows the list of types of property
+    deactivate UI
+
+    client -> UI : choose one type of property
+    activate UI
+
+    alt Property type != Land
+        UI --> client: asks for number of rooms
+        deactivate UI
+
+        client -> UI : choose one type of business
+        activate UI
+    end
+
+UI -> CTRL : getAnnouncementList (business, type, rooms)
+            activate CTRL
+
+                ref over CTRL
+                    Get AnnouncementAvailableListDTO
+                end
+
+            CTRL --> UI : ListAnnouncementDTO
+            deactivate CTRL
+
+
+
+    UI --> client: shows the list of properties
+    deactivate UI
+
+
+    opt ask to order the list
+
+    client -> UI : ask to order the property list
+    activate UI
+
+    UI --> client : shows a list with types of sort
+    deactivate UI
+
+
+    client -> UI: selects a type of sort
+    activate UI
+
+        UI -> CTRL: getAnnouncementListOrdered(type)
+
+
+            activate CTRL
+
+                ref over CTRL
+                    Sort AnnouncementAvailableListDTO
+                end
+            CTRL-->UI:AnnouncementListOrderedDTO
+    deactivate
+
+    UI --> client: shows the AnnouncementList Sorted
+    deactivate
+
+    end
+    client -> UI : Selects a property
+    activate UI
+
+        UI-> CTRL: getAnnouncementById(id)
+            activate CTRL
+
+            ref over CTRL
+                Get AnnouncementAvailable id
+            end
+
+
+        CTRL--> UI :AnnouncementDTO
+                    deactivate
+
+    UI --> client: shows the property chosed with all information \n and option to submit an order
+    deactivate UI
+
+    client -> UI : Choose the option to submit an order
+    activate UI
+
+    UI --> client: request an order price
+    deactivate UI
+
+    client -> UI : Types the price and submit
+        activate UI
+
+    UI->CTRL: createOrder(announcementDTO,value,date)
+
+            activate CTRL
+                ref over CTRL
+                    Get Client Session
+                end
+
+                ref over CTRL
+                    Validate Order and create Order
+                end
+
+
+            CTRL-->UI: success message
+            deactivate CTRL
+        UI --> client : shows a sucess message
+
+    deactivate
+
+
+
+
+
+
+
+
+@enduml

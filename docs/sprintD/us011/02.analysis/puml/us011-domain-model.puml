@@ -1,0 +1,63 @@
+@startuml
+skinparam monochrome true
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+
+skinparam classAttributeIconSize 0
+
+hide circle
+hide methods
+
+title Domain Model US011 - Accept or Decline purchase orders
+
+
+
+class Order{
+   -clientEmail
+    -value
+    -state
+
+}
+
+class "Agent" as agent {
+}
+
+class Announcement{
+AnnouncementsAvailable
+}
+
+
+
+
+
+
+class Client{
+email
+}
+
+
+
+agent "2" - "2"  Order : chooses to process >
+agent "1" -- "*" Announcement : displays >
+
+Announcement "1" -- "*" Order : has >
+
+
+
+Client "1" -- "*" Order : places >
+
+
+Order  -  Declined : can be >
+Order -- Accepted :  can be >
+
+agent "7" -- "*" Client : ´sends email informing the results to >
+
+
+
+
+
+
+
+
+@enduml

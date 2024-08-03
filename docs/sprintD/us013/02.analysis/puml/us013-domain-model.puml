@@ -1,0 +1,47 @@
+@startuml
+skinparam monochrome true
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+
+skinparam classAttributeIconSize 0
+
+hide circle
+hide methods
+
+title Domain Model US013 - List all employees in every store
+
+
+class "Network Store" as NS {}
+
+class "Network Manager" as NM {}
+
+class "Store Manager" as SM {}
+
+class Agency{
+id
+name
+address
+phoneNumber
+email
+}
+
+
+class Employee{
+id
+name
+phoneNumber
+email
+civilNumber
+taxNumber
+password
+}
+
+
+NM "1" --"1" NS : responsible for
+NS "1" -- "1" Agency: Consulted by
+Agency "1" -- "1" SM: responsible for
+SM -->  Employee
+
+
+@enduml

@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<?import javafx.scene.text.Font?>
+<BorderPane prefHeight="530.0" prefWidth="705.0" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="pt.ipp.isep.dei.esoft.project.ui.gui.StoreManagerMainUI">
+    <top>
+        <VBox prefHeight="32.0" prefWidth="705.0" BorderPane.alignment="CENTER">
+            <children>
+                <Separator prefWidth="200.0" />
+                <MenuBar>
+                    <menus>
+                        <Menu fx:id="mnuAccount" mnemonicParsing="false">
+                            <items>
+                                <MenuItem fx:id="mnuLogout" mnemonicParsing="false" onAction="#mnuLogout" />
+
+                                <MenuItem fx:id="mnuClose" mnemonicParsing="false" onAction="#mnuClose" />
+                            </items>
+                        </Menu>
+                        <Menu fx:id="mnuLinear" mnemonicParsing="false">
+                            <items>
+                                <MenuItem fx:id="mnuLinearApp" mnemonicParsing="false" onAction="#mnuLinearAppAction" />
+                            </items>
+                        </Menu>
+
+                    </menus>
+                </MenuBar>
+            </children>
+        </VBox>
+    </top>
+    <center>
+        <Label opacity="0.2" text="RealEstate" BorderPane.alignment="CENTER">
+            <font>
+                <Font name="Copperplate" size="79.0" />
+            </font>
+        </Label>
+    </center>
+    <bottom>
+        <HBox prefHeight="26.0" prefWidth="705.0" BorderPane.alignment="CENTER">
+            <children>
+                <Label fx:id="labelEmailFooter" alignment="TOP_LEFT" opacity="0.4" prefHeight="26.0" prefWidth="255.0">
+                    <padding>
+                        <Insets left="20.0" />
+                    </padding></Label>
+                <AnchorPane prefHeight="69.0" prefWidth="517.0" />
+                <Label alignment="TOP_RIGHT" opacity="0.4" prefHeight="32.0" prefWidth="107.0" text="Cera" textAlignment="CENTER">
+                    <padding>
+                        <Insets right="20.0" />
+                    </padding></Label>
+            </children>
+        </HBox>
+    </bottom>
+</BorderPane>

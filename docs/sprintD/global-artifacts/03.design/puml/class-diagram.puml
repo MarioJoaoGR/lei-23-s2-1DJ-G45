@@ -1,0 +1,835 @@
+@startuml
+
+
+    class AnnouncementController {
+        + getListingAvailable(): List<AnnouncementAvailable>
+        + getListingSold(): List<AnnouncementSold>
+        + getFilteredListing(business: String, type: String, rooms: int): List<AnnouncementAvailable>
+        + addAnnouncementAvailable(announcementAvailable: AnnouncementAvailable)
+        + addAnnouncementSold(announcementSold: AnnouncementSold)
+        + getClientFromSession(): String
+        + isLogin(): boolean
+        + checkAnnouncementExists(id: int): boolean
+        + getAnnouncementById(id: int): Optional<AnnouncementDTO>
+        + createOrder(announcementAvailableDTO: AnnouncementDTO, email: String, value: double): Optional<Order>
+        + getListAnnouncementAvailableDTO(business: String, type: String, rooms: int): List<AnnouncementDTO>
+        + getListAnnouncementAvailableDTOforVisitRequest(): List<AnnouncementDTO>
+        + getOrderListDTO(announcementDTO: AnnouncementDTO): List<OrderDTO>
+        + getListAnnouncementAvailableDTOForAgent(): List<AnnouncementDTO>
+        + sendOrderResultsViaEmail(orders: List<OrderDTO>, announcement: AnnouncementDTO): boolean
+        + getUserName(): String
+        + getEmail(): String
+        + createVisitRequest(visitRequestDTO: VisitRequestDTO, announcementDTO: AnnouncementDTO): boolean
+        + saveOrder(id: int, order: Order)
+        + saveOrderState(id: int, order: Order)
+        + saveVisitRequest(announcementAvailable: AnnouncementAvailable, visitRequest: VisitRequest)
+        + getVisitRequestListForAgent(startDate: Date, endDate: Date)
+        + getVisitRequestListForAgent(email: String, startDate: Date, endDate: Date): List<VisitRequest>
+        + getAllVisitRequestListForAgent(): List<VisitRequest>
+        + getVisitRequestLists(): List<VisitRequest>
+        + getVisitRequestListsWaiting(): List<VisitRequest>
+        + setSortByDate(visitRequests: List<VisitRequest>)
+        + isVisitRequestListEmpty(): boolean
+        + getVisitRequestList(): String[]
+        + getDealsList(): String[]
+        + sendEmail(announcementAvailable: AnnouncementAvailable, visitRequest: VisitRequest, flag: boolean): boolean
+        + scheduleVisit(visitRequest: VisitRequest)
+    }
+
+
+    class ApplicationSession {
+        + getCurrentSession(): UserSession
+    }
+
+    class UserSession {
+        - userEmail: String
+        - isLoggedIn: boolean
+        + getUserEmail(): String
+        + isLoggedIn(): boolean
+    }
+
+
+    class AnnouncementAvailable {
+        - id: int
+        - businessType: String
+        - property: Property
+        - orderList: List<Order>
+        + toDTO(): AnnouncementDTO
+        + addOrder(order: Order): Optional<Order>
+        + createOrder(email: String, value: double): Order
+        + getId(): int
+    }
+
+    class AnnouncementSold {
+        - id: int
+        - businessType: String
+        - property: Property
+        + toString(): String
+    }
+
+    class Property {
+        - type: String
+        - rooms: int
+        + getType(): String
+        + getRooms(): int
+    }
+
+    class Order {
+        - id: int
+        - value: double
+        - email: String
+        + getId(): int
+        + getValue(): double
+        + getEmail(): String
+    }
+
+    class VisitRequest {
+        - date: Date
+        - agentEmail: String
+        - announcementAvailable: AnnouncementAvailable
+        - state: VisitRequestState
+        + getDate(): Date
+        + getAgentEmail(): String
+        + getAnnouncementAvailable(): AnnouncementAvailable
+        + getState(): VisitRequestState
+        + setState(state: VisitRequestState)
+    }
+
+    enum VisitRequestState {
+        WAITING
+        SCHEDULED
+        CANCELED
+        COMPLETED
+    }
+
+
+
+    class AnnouncementDTO {
+        - id: int
+        - businessType: String
+        - propertyType: String
+        - rooms: int
+        - orderList: List<OrderDTO>
+        + getId(): int
+        + getBusinessType(): String
+        + getPropertyType(): String
+        + getRooms(): int
+        + getOrderList(): List<OrderDTO>
+    }
+
+    class OrderDTO {
+        - id: int
+        - value: double
+        - email: String
+        + getId(): int
+        + getValue(): double
+        + getEmail(): String
+    }
+
+    class VisitRequestDTO {
+        - date: Date
+        - agentEmail: String
+        - announcementAvailable: AnnouncementDTO
+        - state: VisitRequestState
+        + getDate(): Date
+        + getAgentEmail(): String
+        + getAnnouncementAvailable(): AnnouncementDTO
+        + getState(): VisitRequestState
+        + setState(state: VisitRequestState)
+    }
+
+
+
+    class CheckScheduleVisitsController {
+        - announcementRepository: AnnouncementRepository
+        - authenticationRepository: AuthenticationRepository
+        - controller: AnnouncementController
+        + CheckScheduleVisitsController()
+        + getScheduleVisitsForClient(): List<AnnouncementDTO>
+        + acceptedScheduleVisit(announcementDTO: AnnouncementDTO, visitRequestDTO: VisitRequestDTO, s: String)
+        + counterSchedule(announcementDTO: AnnouncementDTO, s: VisitRequestDTO, listCounterTimeSlots: List<String>)
+        + removeSchedule(announcementDTO: AnnouncementDTO, s: VisitRequestDTO)
+        - getAnnouncementRepository(): AnnouncementRepository
+        - getAuthenticationRepository(): AuthenticationRepository
+    }
+
+
+
+
+    class CheckScheduleVisitsController {
+        - announcementRepository: AnnouncementRepository
+        - authenticationRepository: AuthenticationRepository
+        - controller: AnnouncementController
+        + CheckScheduleVisitsController()
+        + getScheduleVisitsForClient(): List<AnnouncementDTO>
+        + acceptedScheduleVisit(announcementDTO: AnnouncementDTO, visitRequestDTO: VisitRequestDTO, s: String)
+        + counterSchedule(announcementDTO: AnnouncementDTO, s: VisitRequestDTO, listCounterTimeSlots: List<String>)
+        + removeSchedule(announcementDTO: AnnouncementDTO, s: VisitRequestDTO)
+        - getAnnouncementRepository(): AnnouncementRepository
+        - getAuthenticationRepository(): AuthenticationRepository
+    }
+
+
+    class AnnouncementRepository {
+        + getScheduleVisitsForClient(): List<AnnouncementAvailable>
+        + getNrPropertiesOfAnAgency(agency: Agency): int
+    }
+
+
+
+
+    class AnnouncementAvailable {
+        + acceptVisitRequest(visitRequest: VisitRequest, s: String)
+        + counterPurpose(visitRequest: VisitRequest, listCounterTimeSlots: List<String>)
+        + rejectTimeRequest(visitRequest: VisitRequest)
+    }
+
+
+
+
+
+    class AnnouncementMapper {
+        + toDTO(announcementAvailableList: List<AnnouncementAvailable>): List<AnnouncementDTO>
+        + toAnnouncementAvailable(announcementDTO: AnnouncementDTO): AnnouncementAvailable
+    }
+
+    class VisitRequestMapper {
+        + fromDTO(visitRequestDTO: VisitRequestDTO): VisitRequest
+    }
+
+
+
+    class ControllerDivideStores {
+        - announcementRepository: AnnouncementRepository
+        - agencyRepository: AgencyRepository
+        + ControllerDivideStores()
+        + ControllerDivideStores(announcementRepository: AnnouncementRepository, agencyRepository: AgencyRepository)
+        - getAnnouncementRepository(): AnnouncementRepository
+        - getAgencyRepository(): AgencyRepository
+        + getAgencies(): List<Agency>
+        + getNrProperitesForEachAgency(): AlgorithmInfo
+    }
+
+
+
+
+    class Agency {
+        + getId(): String
+        + getName(): String
+    }
+
+    class BruteForceAlgorithm {
+        + getPartitions(array: String[][]): AlgorithmInfo
+    }
+
+   class AlgorithmInfo {
+       - list1: List<Integer>
+       - list2: List<Integer>
+       - list3: List<String>
+       - list4: List<String>
+       - timeAlgorithm: long
+
+       + AlgorithmInfo(list1: List<Integer>, list2: List<Integer>, list3: List<String>, list4: List<String>, timeAlgorithm: long)
+       + getList1(): List<Integer>
+       + getList3(): List<String>
+       + getList4(): List<String>
+       + getTimeAlgorithm(): long
+       + getList2(): List<Integer>
+   }
+
+
+    class CreateRequestController {
+        - agencyRepository: AgencyRepository
+        - requestRepository: RequestRepository
+        - agentMapper: AgentMapper
+        - agencyMapper: AgencyMapper
+        + CreateRequestController()
+        + CreateRequestController(agencyRepository: AgencyRepository, requestRepository: RequestRepository)
+        - getAgencyRepository(): AgencyRepository
+        - getRequestRepository(): RequestRepository
+        + getSortedAgent(agencyChosedDTO: AgencyDTO): Optional<AgentDTO>
+        + getSortedAgency(): AgencyDTO
+        + getAgencysFromController(): List<AgencyDTO>
+        + getAgentsFromController(agencyDTO: AgencyDTO): List<AgentDTO>
+        + createAndSaveRequest(requestDto: RequestDTO): boolean
+        + createOwner(ownerDTO: OwnerDTO): Optional<Owner>
+        + ...
+    }
+
+
+
+    class AgencyRepository {
+        + getAgencyList(): List<Agency>
+        + getRandomAgency(): Agency
+    }
+
+    class RequestRepository {
+        + createRequest(requestDto: RequestDTO): Optional<Request>
+        + checkIfRequestExists(request: Request): boolean
+    }
+
+    class Repositories {
+        + getAgencyRepository(): AgencyRepository
+        + getRequestRepository(): RequestRepository
+        + getAuthenticationRepository(): AuthenticationRepository
+        + getAnnouncementRepository(): AnnouncementRepository
+        + getAgencyRepository(): AgencyRepository
+    }
+
+
+    class Request {
+        - idCount: int
+        - requestId: int
+        - date: Date
+        - area: double
+        - location: String
+        - distanceFromCityCenter: double
+        - requestedPrice: double
+        - requestType: String
+        - photographs: List<String>
+        - agente: Agent
+        - owner: Owner
+        - typeOfCommercialize: String
+
+        + Request()
+        + Request(date: Date, typeOfCommercialize: String, agente: Agent, area: double, location: String, distanceFromCityCentre: double, requestedPrice: double, owner: Owner, photographs: List<String>)
+        + Request(typeOfCommercialize: String, agente: Agent, area: double, location: String, distanceFromCityCentre: double, requestedPrice: double, owner: Owner, photographs: List<String>)
+        + Request(id: int, typeOfCommercialize: String, agente: Agent, area: double, location: String, distanceFromCityCentre: double, requestedPrice: double, owner: Owner, photographs: List<String>)
+        + getDate(): Date
+        + static getIdCount(): int
+        + getPhotographs(): List<String>
+        + isRequestType(type: String): boolean
+        + getRequestType(): String
+        + toString(): String
+        + getTypeOfCommercialize(): String
+        + equals(o: Object): boolean
+        + hashCode(): int
+        + addPhoto(photo: String): void
+        + clone(): Request
+
+    }
+
+
+
+
+    class AgencyDTO {
+      - name: String
+      - address: String
+      - phoneNumber: long
+      - email: String
+      - storeManager: StoreManagerDTO
+      - agentDTOList: List<AgentDTO>
+      --
+      + AgencyDTO()
+      + setAgentDTOList(agentDTOList: List<AgentDTO>): void
+      + getName(): String
+      + setName(name: String): void
+      + getAddress(): String
+      + setAddress(address: String): void
+      + getPhoneNumber(): long
+      + setPhoneNumber(phoneNumber: long): void
+      + getEmail(): String
+      + setEmail(email: String): void
+      + getStoreManager(): StoreManagerDTO
+      + setStoreManager(storeManager: StoreManagerDTO): void
+      + getAgentDTOList(): List<AgentDTO>
+      + getRandomAgent(): Optional<AgentDTO>
+    }
+
+    class AgentDTO {
+      - phoneNumber: long
+      - taxNumber: int
+      - civilNumber: int
+      - address: String
+      - mail: String
+      - name: String
+      --
+      + AgentDTO()
+      + setPhoneNumber(phoneNumber: long): void
+      + setTaxNumber(taxNumber: int): void
+      + setCivilNumber(civilNumber: int): void
+      + setAddress(address: String): void
+      + setMail(mail: String): void
+      + setName(name: String): void
+      + getPhoneNumber(): long
+      + getTaxNumber(): int
+      + getCivilNumber(): int
+      + getAddress(): String
+      + getMail(): String
+      + getName(): String
+    }
+
+    class StoreManagerDTO {
+      - name: String
+      - email: String
+      --
+      + StoreManagerDTO()
+      + setName(name: String): void
+      + getName(): String
+      + setEmail(email: String): void
+      + getEmail(): String
+    }
+
+
+
+    class RequestDTO {
+      - date: Date
+      - equipment: String
+      - area: double
+      - location: String
+      - distanceFromCityCenter: double
+      - requestedPrice: double
+      - requestType: String
+      - photographs: List<String>
+      - numberBedrooms: int
+      - numberBathrooms: int
+      - numberParkingSpaces: int
+      - basement: Boolean
+      - inhabitableLoft: Boolean
+      - sunExposure: String
+      - id: int
+      - agent: AgentDTO
+      - owner: OwnerDTO
+      - typeOfCommercialize: String
+    }
+
+
+
+
+
+    class AgentMapper {
+        +toDTO(agent: Agent): AgentDTO
+        +toDTO(agentList: List<Agent>): List<AgentDTO>
+        +fromDTO(dto: AgentDTO): Agent
+    }
+    class AgencyMapper {
+            - storeManagerMapper: StoreManagerMapper
+            +toDTO(agency: Agency): AgencyDTO
+            -toDTO(agent: Agent): AgentDTO
+            +toDTO(agencyList: List<Agency>): List<AgencyDTO>
+            +fromDTO(dto: AgencyDTO): Agency
+        }
+
+
+
+
+
+    class ImportController {
+        - adapterCSV: ExternalModuleAdapterCSV
+
+        + addLegacyFile(file: File, filePath: String): boolean
+        + validateCSV(file: File): boolean
+        + validateEmpty(file: File): boolean
+    }
+
+
+
+
+
+
+
+
+    class ExternalModuleAdapterCSV {
+        - externalModuleCSVList: List<ExternalModuleCSV>
+        - controller: AnnouncementController
+        - columnNames: String[]
+
+        + readFile(filePath: String): boolean
+        + addRepositorys(): void
+        - getValueAsInt(columnIndices: Map<String, Integer>, values: String[], columnName: String): int
+        - getValueAsLong(columnIndices: Map<String, Integer>, values: String[], columnName: String): long
+        - getValueAsDouble(columnIndices: Map<String, Integer>, values: String[], columnName: String): double
+        - getValueAsSunExposure(columnIndices: Map<String, Integer>, values: String[], columnName: String): String
+        - getValueAsBoolean(columnIndices: Map<String, Integer>, values: String[], columnName: String): boolean
+        - getValueAsDate(columnIndices: Map<String, Integer>, values: String[], columnName: String): Date
+        - getValue(columnIndices: Map<String, Integer>, values: String[], columnName: String): String
+        - validateNumberColumns(values: String[]): boolean
+        - addAnnouncement(announcementSold: AnnouncementSold): void
+    }
+
+class ExternalModuleCSV {
+  - sid: int
+  - owner_name: String
+  - owner_passportNum: long
+  - owner_TIN: long
+  - owner_email: String
+  - owner_phone: long
+  - property_type: String
+  - property_area: double
+  - property_location: String
+  - property_distanceFromCenter: double
+  - property_numberBedrooms: int
+  - property_numberBathrooms: int
+  - property_pnumParking: int
+  - property_centralHeating: boolean
+  - property_airconditioned: boolean
+  - property_basement: boolean
+  - property_loft: boolean
+  - property_sunExposure: String
+  - property_requested_sale_rent_price: double
+  - property_sale_rent_price: double
+  - commission: Commission
+  - contract_duration: int
+  - property_dateAnnounceRequest: Date
+  - property_dateofSale: Date
+  - type_business: String
+  - store_ID: int
+  - store_name: String
+  - store_location: String
+  - store_phonenumber: long
+  - store_emailAddress: String
+
+  + ExternalModuleCSV()
+  + getOwner(): Owner
+  + getProperty(): Property
+  + getAnnouncementSold(): AnnouncementSold
+  + validateOwner(): boolean
+  + validateAgency(): boolean
+  + getEquipment(): String
+}
+
+
+
+    class AnnouncementAvailable {
+            - id: int
+            - commission: Commission
+            - date: Date
+            - price: double
+            - visitRequests: List<VisitRequest>
+            - businessType: String
+            - property: Property
+            - agent: Agent
+            - orderList: List<Order>
+            + AnnouncementAvailable(commission: Commission, date: Date, price: double, visitRequests: List<VisitRequest>, businessType: String, property: Property, agent: Agent, orderList: List<Order>)
+            + AnnouncementAvailable(id: int, commission: Commission, date: Date, visitRequests: List<VisitRequest>, businessType: String, property: Property, agent: Agent, orderList: List<Order>, price: double)
+            + AnnouncementAvailable(commission: Commission, price: double, date: Date, businessType: String, property: Property, agent: Agent)
+            + AnnouncementAvailable(commission: Commission, price: double, date: Date, visitRequests: List<VisitRequest>, businessType: String, property: Property, agent: Agent)
+            + AnnouncementAvailable(commission: Commission, price: double, date: Date, visitRequests: List<VisitRequest>, businessType: String, property: Property, agent: Agent, orderList: List<Order>)
+            + AnnouncementAvailable()
+            + clone(): AnnouncementAvailable
+            + getCommissionValue(): double
+            + getCommissionType(): String
+            + getIdCount(): int
+            + getId(): int
+            + getCommission(): Commission
+            + setCommission(commission: Commission): void
+            + getDate(): Date
+            + setDate(date: Date): void
+            + getBusinessType(): String
+            + setBusinessType(businessType: String): void
+            + getProperty(): Property
+            + setId(id: int): void
+            + setProperty(property: Property): void
+            + getAgent(): Agent
+            + setAgent(agent: Agent): void
+            + getVisitRequests(): List<VisitRequest>
+            + setVisitRequests(visitRequests: List<VisitRequest>): void
+            + filterProperty(business: String, type: String, room: int): boolean
+            + isBusiness(business: String): boolean
+            + equals(o: Object): boolean
+            + hashCode(): int
+            + getOrderList(): List<Order>
+            + createOrder(email: String, value: double): Order
+            + addOrder(order: Order): Optional<Order>
+            - validateOrderValue(order: Order): boolean
+            - validateOrderValueRepeat(order: Order): boolean
+            - validateOrderRepeatClient(order: Order): boolean
+            - orderListDoNotContain(order: Order): boolean
+            + toDTO(): AnnouncementDTO
+            + toString(): String
+        }
+
+    class AnnouncementSold {
+            - idCount: int
+            - id: int
+            - comission: Commission
+            - price: double
+            - date: Date
+            - businessType: String
+            - property: Property
+            - agent: Agent
+            - orderList: List<Order>
+            - ContractDuraction: int
+            - salePrice: double
+            - saleDate: Date
+            - agency: Agency
+            + AnnouncementSold()
+            + getIdCount(): int
+            + setIdCount(idCount: int): void
+            + getBusinessType(): String
+            + setBusinessType(businessType: String): void
+            + getAgent(): Agent
+            + AnnouncementSold(comission: Commission, requestPrice: double, date: Date, business: String, property: Property, contractDuraction: int, saleDate: Date, salePrice: double, agency: Agency)
+            + AnnouncementSold(id: int, comission: Commission, price: double, date: Date, business: String, property: Property, agent: Agent, orderList: List<Order>, contractDuraction: int, saleDate: Date, salePrice: double, agency: Agency)
+            + AnnouncementSold(id: int, comission: Commission, price: double, date: Date, businessType: String, property: Property, agent: Agent, orderList: List<Order>, contractDuraction: int, salePrice: double, saleDate: Date, agency: Agency)
+            + setAgent(agent: Agent): void
+            + getId(): int
+            + setId(id: int): void
+            + getComission(): Commission
+            + setComission(comission: Commission): void
+            + getPrice(): double
+            + setPrice(price: double): void
+            + getDate(): Date
+            + setDate(date: Date): void
+            + getProperty(): Property
+            + setProperty(property: Property): void
+            + clone(): AnnouncementSold
+            + equals(o: Object): boolean
+            + hashCode(): int
+            + getOrderList(): List<Order>
+            + createOrder(email: String, value: double): Order
+            + addOrder(order: Order): Optional<Order>
+            + setOrderList(orderList: List<Order>): void
+            + getContractDuraction(): int
+            + setContractDuraction(contractDuraction: int): void
+            + getSalePrice(): double
+            + setSalePrice(salePrice: double): void
+            + getSaleDate(): Date
+            + setSaleDate(saleDate: Date): void
+            + getAgency(): Agency
+            + getAgencyFromRepository(): Agency
+            + setAgency(agency: Agency): void
+            + toString(): String
+        }
+
+
+
+
+
+    class PublishAnnouncementController {
+        - requestRepository: RequestRepository
+        - announcementRepository: AnnouncementRepository
+        - authenticationRepository: AuthenticationRepository
+
+        + getAgentFromSession(): Agent
+        + checkRequestId(requestId: int): boolean
+        + getAgentRequests(): List<Request>
+        + publishSale(requestId: int, commission: Commission): void
+        + getRequestById(requestId: int): Request
+    }
+
+
+
+
+    class Commission {
+        - COMMISSION_TYPE_FIXED: String
+        - COMMISSION_TYPE_PERCENTAGE: String
+        - commissionValue: double
+        - commissionType: String
+
+        + Commission()
+        + Commission(commissionValue: double, commissionType: String)
+        + getCommissionValue(): double
+        + setCommissionValue(commissionValue: double): void
+        + getCommissionType(): String
+        + setCommissionTypeFixed(): void
+        + setCommissionTypePercentage(): void
+        + getCOMMISSION_TYPE_FIXED(): String
+        + getCOMMISSION_TYPE_PERCENTAGE(): String
+        + equals(o: Object): boolean
+    }
+
+
+
+
+
+    class PublishAnnouncementPhoneCallController {
+        - authenticationRepository: AuthenticationRepository
+        - announcementRepository: AnnouncementRepository
+
+        + getAnnouncementList(): List<AnnouncementAvailable>
+        + getAgentFromSession(): Agent
+        + addTextMessageToOwnerTextbox(owner: Owner, message: String): void
+    }
+
+
+
+
+
+    class Owner {
+        - idCount: int
+            - id: int
+            - name: String
+            - cardNumber: long
+            - taxNumber: long
+            - address: String
+            - email: String
+            - phoneNumber: long
+            - textMessages: List<String>
+
+            + Owner()
+            + addMessage(sms: String): void
+            + getTextMessages(): List<String>
+            + getName(): String
+            + equals(o: Object): boolean
+            + hashCode(): int
+            + setName(name: String): void
+            + getCardNumber(): long
+            + setCardNumber(cardNumber: int): void
+            + getTaxNumber(): long
+            + setTaxNumber(taxNumber: int): void
+            + getAddress(): String
+            + setAddress(address: String): void
+            + getEmail(): String
+            + setEmail(email: String): void
+            + getPhoneNumber(): long
+            + setPhoneNumber(phoneNumber: long): void
+            + Owner(name: String, cardNumber: long, taxNumber: long, address: String, email: String, phoneNumber: long)
+            + Owner(ownerDTO: OwnerDTO)
+            + getId(): int
+
+    }
+
+
+
+    class RegisterUserController {
+        - authFacade: AuthFacade
+
+        + addUser(name: String, email: String, pwd: String): boolean
+    }
+
+
+    class UserLogin {
+       - name: String
+           - email: String
+           - pwd: String
+           - role: String
+
+           + UserLogin(name: String, email: String, pwd: String, role: String)
+           + UserLogin()
+           + getName(): String
+           + setName(name: String): void
+           + getEmail(): String
+           + setEmail(email: String): void
+           + getPwd(): String
+           + setPwd(pwd: String): void
+           + getRole(): String
+           + setRole(role: String): void
+           + equals(o: Object): boolean
+           + hashCode(): int
+    }
+
+
+    class AuthenticationRepository {
+        - authenticationFacade: AuthFacade
+            - userRepository: UserLoginRepository
+
+            + AuthenticationRepository()
+            + getAgentByEmail(agentEmail: String): Agent
+            + doLogin(email: String, pwd: String): boolean
+            + doLogout(): void
+            + getCurrentUserSession(): UserSession
+            + getMailFromUserFromSession(): String
+            + addUserRole(id: String, description: String): boolean
+            + getRoles(): List<UserRoleDTO>
+            + addUserWithRole(name: String, email: String, pwd: String, roleId: String): boolean
+            + createEmployee(employeeDTO: EmployeeDTO): Employee
+            + getUsersWithRole(role: String): List<UserDTO>
+            + getUsers(): List<UserDTO>
+            + removeUser(mail: String): boolean
+            + getUserRepository(): UserLoginRepository
+    }
+
+
+    class UserLoginRepository {
+       - userList: List<UserLogin>
+
+           + UserLoginRepository()
+           + getUserList(): List<UserLogin>
+           + add(userLogin: UserLogin): void
+    }
+
+
+    class AuthFacade {
+        - authFacade: AuthFacade
+
+        + addUser(name: String, email: String, pwd: String): boolean
+    }
+
+
+AnnouncementController -- AnnouncementAvailable
+AnnouncementController -- AnnouncementSold
+AnnouncementController -- AnnouncementDTO
+AnnouncementController -- Order
+AnnouncementController -- OrderDTO
+AnnouncementController -- VisitRequest
+AnnouncementController -- VisitRequestDTO
+AnnouncementController -- Property
+AnnouncementController -- VisitRequestState
+mappers.AnnouncementMapper --> AnnouncementDTO
+mappers.AnnouncementMapper --> AnnouncementAvailable
+
+
+RegisterUserController --down-> AuthFacade
+RegisterUserController --> UserLogin
+RegisterUserController --> AuthenticationRepository
+RegisterUserController --> UserLoginRepository
+AuthenticationRepository -> UserLogin
+Repositories -> AuthenticationRepository
+Repositories -> UserLoginRepository
+PublishAnnouncementPhoneCallController --down-> AuthenticationRepository
+PublishAnnouncementPhoneCallController --down-> AnnouncementRepository
+PublishAnnouncementPhoneCallController --> Agent
+PublishAnnouncementPhoneCallController --> AnnouncementAvailable
+PublishAnnouncementPhoneCallController --> Owner
+Owner --> UserDTO
+UserDTO --> UserSession
+
+PublishAnnouncementController --down-> RequestRepository
+PublishAnnouncementController --down-> AnnouncementRepository
+PublishAnnouncementController --down-> AuthenticationRepository
+PublishAnnouncementController --> Agent
+PublishAnnouncementController --> Commission
+PublishAnnouncementController --> Request
+
+ImportController --down-> ExternalModuleAdapterCSV
+ImportController --down-> ExternalModuleCSV
+
+
+
+ApplicationSession --> UserSession
+
+CreateRequestController --> AgencyRepository
+CreateRequestController --> RequestRepository
+CreateRequestController --> AgentMapper
+CreateRequestController --> AgencyMapper
+AgencyRepository --> Agent
+RequestRepository --> Request
+RequestRepository --> RequestDTO
+AgencyDTO -> AgentDTO
+AgencyDTO -> Agency
+AgencyMapper -> Agency
+AgentMapper -> Agent
+ControllerDivideStores --> AnnouncementRepository
+ControllerDivideStores --> AgencyRepository
+AgencyRepository -> Agency
+AnnouncementRepository --> Agency
+AnnouncementRepository --> BruteForceAlgorithm
+BruteForceAlgorithm --> AlgorithmInfo
+
+CheckScheduleVisitsController --> mappers.AnnouncementMapper
+CheckScheduleVisitsController --> mappers.VisitRequestMapper
+AnnouncementRepository --> AnnouncementAvailable
+AnnouncementAvailable --> VisitRequest
+
+mappers.VisitRequestMapper --> VisitRequestDTO
+mappers.VisitRequestMapper --> VisitRequest
+
+CheckScheduleVisitsController --> AnnouncementRepository
+CheckScheduleVisitsController --> AuthenticationRepository
+CheckScheduleVisitsController --> AnnouncementController
+AgencyDTO  -->  AgentDTO
+    AgencyDTO  -->  StoreManagerDTO
+    AnnouncementAvailable-->  AnnouncementMapper
+    AnnouncementSold-->  AnnouncementMapper
+    AnnouncementMapper--> AnnouncementDTO
+    AnnouncementDTO-->AnnouncementMapper
+    AnnouncementDTO-->AnnouncementAvailable
+    VisitRequest-->VisitRequestMapper
+    VisitRequestMapper-->VisitRequestDTO
+    VisitRequestDTO-->VisitRequestMapper
+    VisitRequestMapper->VisitRequest
+
+
+
+@enduml

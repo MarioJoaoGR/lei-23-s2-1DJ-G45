@@ -1,0 +1,95 @@
+@startuml
+skinparam monochrome true
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+autonumber
+
+'hide footbox
+actor "Network manager" as net
+participant ":ListEmployeesUI" as UI
+participant ":ListEmployeeController" as CTRL
+participant ":repositories:" as rep
+participant "Repository\n:Repository:" as ST
+participant "agencyRepository\n:AgencyRepository:" as STORE
+participant "agency\n:Agency" as A
+participant "listOfEmployees\n:ListOfEmployees" as E
+participant "agencyMapper\n:AgencyMapper" as AMAPPER
+participant "employeeDTO\n:EmployeeDTO" as EMPDTO
+participant "agencyDTO\n:AgencyDTO" as AGNDTO
+
+activate net
+
+net -> UI : Asks to list employees in every store
+
+activate UI
+UI -> CTRL** : create()
+
+UI-> CTRL: getAgencyListSorted()
+activate CTRL
+
+'repository
+CTRL -> rep:getInstance()
+activate rep
+rep-->CTRL:repositories
+deactivate rep
+CTRL -> ST: getAgencyRepository()
+activate ST
+ST-->CTRL:agencyRepository
+deactivate ST
+'repository end
+
+'getting sorted list of agencies
+
+'sorting agencies
+CTRL->STORE:getAgencyListSorted()
+activate STORE
+STORE->STORE:getAgenciesList()
+activate STORE
+deactivate STORE
+STORE->STORE:sort()
+'sorting agencies end
+
+'sort employees
+loop for each Store in AgenciesList get listOfEmployees
+STORE->A:getListOfEmployees()
+activate A
+A-->STORE:ListOfEmployees()
+deactivate A
+STORE->STORE:sort()
+
+end
+STORE -->CTRL:agencyListSort
+deactivate STORE
+'sort employees end
+
+'getting sorted list of agencies end
+
+'Mapper e DTOs
+CTRL->AMAPPER:toDTO(agencyListSort)
+activate AMAP
+AMAPPER->EMPDTO**:create()
+AMAPPER->AGNDTO**:create()
+loop for each agency in agenciesListSort
+loop for each Employee in employeeList
+AMAPPER->AMAPPER:toDTO(employee)
+activate EMPDTO
+EMPDTO-->AMAPPER:employeeDTO
+deactivate EMPDTO
+AMAPPER->AMAPPER:add(employeeDTO)
+end
+AMAPPER->AMAPPER:toDTO(agency)
+activate AGNDTO
+AGNDTO-->AMAPPER:agencyDTO
+deactivate AGNDTO
+AMAPPER->AMAPPER:add(agencyDTO)
+end
+AMAPPER-->CTRL:agencyDTOListSort
+deactivate AMAPPER
+CTRL-->UI:agencyDTOListSort
+deactivate CTRL
+UI-->net:shows list
+deactivate UI
+
+deactivate net
+@enduml

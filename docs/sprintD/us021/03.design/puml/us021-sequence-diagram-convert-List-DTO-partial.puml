@@ -1,0 +1,45 @@
+@startuml
+skinparam monochrome true
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+autonumber
+
+'hide footbox
+
+
+
+participant "visitRequestMapper\n:VisitRequestMapper" as mapper
+
+participant "ListVisitRequest\n:List<VisitRequest>" as List
+participant "ListVisitRequestDTO\n:List<VisitRequestDTO>" as ListDTO
+participant "visitRequestDTO\n:VisitRequestDTO" as DTO
+
+
+
+                  -> mapper:toDto(ListVisitRequest)
+                  activate mapper
+
+            mapper->ListDTO**:createDTO
+            loop foreach object of the List
+            mapper -> List : get(i)
+            activate List
+            List --> mapper : VisitRequest
+            deactivate List
+
+            mapper -> mapper : toDto(VisitRequest)
+            activate mapper
+            mapper-> DTO** : create(VisitRequest)
+            deactivate
+            mapper --> ListDTO : add(VisitRequestDTO)
+            activate ListDTO
+            deactivate
+
+            end
+
+
+
+            <--mapper : ListVisitRequestDTO
+            deactivate
+
+@enduml

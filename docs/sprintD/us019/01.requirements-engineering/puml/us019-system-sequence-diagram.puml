@@ -1,0 +1,23 @@
+@startuml
+skinparam monochrome true
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+title US010 - System Sequence Diagram (SSD)
+autonumber
+
+actor "Client" as client
+participant ":System" as System
+
+activate client
+
+    client -> System : ask to  to divide the set of all stores into two subsets, so that the total number of properties of the stores between the two subsets is the closest possible
+    activate System
+
+    System --> client: shows the sublists of the partition of the agenciesId with the respective property
+    deactivate
+
+
+
+
+@enduml

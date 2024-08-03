@@ -1,0 +1,51 @@
+@startuml
+skinparam monochrome true
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+
+skinparam classAttributeIconSize 0
+
+hide circle
+hide methods
+
+
+
+class AnnouncementAvailable{
+id
+listingDate
+comission
+requestPrice
+typeBusiness
+}
+
+
+class Agent{
+Agency
+}
+
+
+class VisitRequest{
+date
+timeSlot
+visitRequestOpinion
+}
+
+
+class Visit{
+listingDate
+agentIdication
+}
+
+
+
+
+Agent "1" -- "*" AnnouncementAvailable : publish >
+Visit "1" -"1" AnnouncementAvailable :  related to >
+VisitRequest "1" -- "1" Visit : can become >
+
+
+
+
+
+@enduml

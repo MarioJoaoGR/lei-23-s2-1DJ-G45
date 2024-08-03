@@ -1,0 +1,207 @@
+@startuml
+'skinparam monochrome true
+skinparam packageStyle rectangle
+skinparam shadowing false
+skinparam linetype polyline
+'skinparam linetype orto
+
+skinparam classAttributeIconSize 0
+
+'left to right direction
+
+class "ListingController" as Listctrl{
+
+
+    +ListingController(announcementRepository)
+    + getPropertyList()
+
+
+
+}
+
+class AnnouncementRepository {
+    + getPropertyList(business, type, rooms)
+    + sortByPriceAsc(PropertyList)
+    + sortByPriceDesc(PropertyList)
+    + sortByPriceParish(PropertyList)
+    + sortByRecent(PropertyList)
+}
+
+class Property {
+    -Int id
+    -String type
+    -String location
+    -Int area
+    -Int distanceCenter
+    -String description
+    -photograph
+    -Owner owner
+
+    + isType(type)
+    +numberRooms(rooms)
+}
+
+class Apartment {
+    -Int numberRooms
+    -Int numberBathrooms
+    -Int numberParking
+    -String equipment
+
+    + numberRooms(rooms)
+}
+
+
+class House {
+    -Int numberRooms
+    -Int numberBathrooms
+    -Int numberParking
+    -String equipment
+    -basement
+    -loft
+    -sunExposure
+
+    + numberRooms(rooms)
+}
+
+
+class Land {
+
+}
+
+class Announcement {
+    -Int id
+    -Date date
+    -Double comission
+    -Double price
+    -Property PropertyList
+    -Agent agent
+    + filterProperty(business, type, rooms)
+    +isBusiness(business)
+}
+
+class SearchUI {
+}
+
+class Repositories {
+    - Repositories()
+    + getInstance() : Repositories
+    + getAnnouncementRepository()
+}
+
+class "Unregistered user" as UU {
+
+
+}
+
+
+class "RegisterUserController" as Userctrl{
+    +RegisterUser(name,email,password)
+
+
+
+}
+
+class UserRepository {
+    +isAccountAlreadyRegistered(userEmail)
+    +addUser(name,email,password)
+    +validateUser(user)
+}
+
+
+
+
+class User {
+    -String name
+    -String email
+    -String password
+
+    +User(name,email,password)
+
+}
+
+class RegisterUserIU {
+}
+
+class Repositories {
+    - Repositories()
+    + getInstance() : Repositories
+    + getUserRepository()
+}
+
+
+
+class RegisterStoreUI
+
+class RegisterStoreController{
++registerstore (ID;designation;location;localmanager;emailaddress;telephonenumber)
+}
+
+class Repositories {
+    - Repositories()
+    + getInstance() : Repositories
+    + getStoreRepository()
+}
+
+class Agency{
+}
+class AgencyRepository{
+    -ID
+    -designation
+    -location
+    -localmanager
+    -telephonenumber
+    -emailaddress
+
+    +validatestore(ID;designation;location;localmanager;emailaddress;telephonenumber)
+    +addstore(ID;designation;location;localmanager;emailaddress;telephonenumber)
+    }
+
+
+RegisterStoreController -|> Store
+
+RegisterStoreUI .> RegisterStoreController
+
+RegisterStoreController .> AgencyRepository
+RegisterStoreController .-> Repositories
+RegisterStoreController .-> Agency
+
+
+AgencyRepository --> Agency
+
+Agency --> Store  : registers
+
+
+
+RegisterUserIU .> Userctrl
+
+Userctrl .> UserRepository
+Userctrl .-> Repositories
+Userctrl .-> User
+
+
+Repositories -> Repositories : instance
+
+UserRepository --> User : User
+
+UU --> User  : become an
+
+
+
+SearchUI .> Listctrl
+
+Listctrl .> AnnouncementRepository
+Listctrl .-> Repositories
+Listctrl .-> Property
+
+class Apartment extends Property
+class House extends Property
+class Land extends Property
+
+
+
+AnnouncementRepository --> Announcement : Announcement
+Announcement --> Property : is about
+
+Announcement --> UU : is view by
+
+@enduml

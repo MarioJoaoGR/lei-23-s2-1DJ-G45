@@ -1,0 +1,72 @@
+@startuml
+skinparam monochrome true
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+
+
+
+participant "announcementRepository:\nAnnouncementRepository" as AnnouncementRepo
+participant "announcement:\nAnnouncement" as Announcement
+participant "property:\nProperty" as prop
+
+participant "property:\nProperty" as prop
+
+participant "land:\nLand" as land
+participant "apartment:\nApartment" as apart
+participant "house:\nHouse" as house
+
+
+autonumber 10
+-> AnnouncementRepo: getPropertyList (business, type, rooms)
+            activate AnnouncementRepo
+            loop for each Announcement
+                                 'ListRepo -> ListRepo: filterBy(business,type,rooms)
+                                 AnnouncementRepo -> Announcement: filterProperty(business,\ntype,rooms)
+
+                                 activate Announcement
+
+
+
+
+                                     Announcement -> Announcement : isBusiness(business)
+
+
+
+
+
+                                    Announcement -> prop : isType(type)
+
+
+                                    activate prop
+
+                                    prop --> Announcement : true/false
+
+                                    deactivate
+
+                                    alt type=apartment
+
+                                        Announcement -> apart : numberRooms(rooms)
+                                        activate apart
+
+                                        apart --> Announcement : true/false
+
+                                        deactivate apart
+                                        else type=house
+                                            Announcement -> house : numberRooms(rooms)
+                                            activate house
+
+                                            house --> Announcement : true/false
+
+                                            deactivate house
+                                    end
+
+                                 Announcement --> AnnouncementRepo : Property
+                                 deactivate Announcement
+                            end
+
+<-- AnnouncementRepo: sortByRecent(propertyList)
+               deactivate AnnouncementRepo
+
+
+@enduml

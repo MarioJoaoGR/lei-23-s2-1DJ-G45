@@ -1,0 +1,37 @@
+@startuml
+skinparam monochrome true
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+title US012 - System Sequence Diagram (SSD)
+autonumber
+
+actor "Admin" as admin
+participant ":System" as System
+
+activate admin
+
+    admin -> System : asks to import a legacy file
+    activate System
+
+    System --> admin: shows the menu to choose a file from local machine
+    deactivate System
+
+    admin -> System : Selects a file and submit
+    activate System
+
+    alt file is in the correct format
+        System --> admin : shows a success message
+    else file is not a CSV
+        System --> admin : shows a insuccess message
+    else file is not in the correct formar or is empty
+        System --> admin : shows a insuccess message
+
+    end
+
+
+    deactivate
+
+
+
+@enduml

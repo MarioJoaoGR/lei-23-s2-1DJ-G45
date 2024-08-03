@@ -1,0 +1,99 @@
+@startuml
+skinparam monochrome true
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+title US010 - System Sequence Diagram (SSD)
+autonumber
+
+actor "Client" as client
+participant ":System" as System
+
+activate client
+
+    client -> System : ask to search for properties
+    activate System
+
+    System --> client: shows the list of types of business
+    deactivate
+
+    client -> System : choose one type of business
+    activate System
+
+    System --> client: shows the list of types of property
+    deactivate System
+
+    client -> System : choose one type of property
+    activate System
+
+    alt Property type != Land
+        System --> client: asks for number of rooms
+        deactivate System
+
+        client -> System : choose one type of business
+        activate System
+    end
+
+
+    System --> client: shows the list of properties
+    deactivate System
+
+
+    opt ask to order the list
+
+    client -> System : ask to order the property list
+    activate System
+
+    System --> client : shows a list with types of sort
+    deactivate System
+
+
+    client -> System: selects a type of sort
+    activate System
+
+    alt Sort type == ascending price
+        System -> client: shows the list of properties ordered by ascending price
+
+        else Sort type == descending price
+            System -> client: shows the list of properties ordered by descending price
+        else Sort type == parish
+            System -> client: shows the list of properties ordered by parish
+
+        else Sort type == recent date
+            System -> client: shows the list of properties ordered by date
+    deactivate
+    end
+
+
+    end
+    client -> System : Selects a property
+    activate System
+
+    System --> client: shows the property chosed with all information \n and option to submit an order
+    deactivate System
+
+    client -> System : Choose the option to submit an order
+    activate System
+
+    System --> client: request an order price
+    deactivate System
+
+    client -> System : Types the price and submit
+        activate System
+
+    alt   order amount <= announcement price
+        System --> client : shows a sucess message
+        else order amount > announcement price
+        System --> client : shows a insucess message
+        else client has another request to this property
+        System --> client : shows a insucess message
+        else order ammount == ammount from another order for this announcement
+        System --> client : shows a insucess message and the order that \n already exist
+
+
+    deactivate
+
+    end
+
+
+@enduml

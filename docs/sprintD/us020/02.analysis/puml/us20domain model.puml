@@ -1,0 +1,83 @@
+@startuml
+skinparam monochrome true
+skinparam packageStyle rectangle
+skinparam shadowing false
+'skinparam linetype ortho
+'left to right direction
+skinparam classAttributeIconSize 0
+hide circle
+hide methods
+
+class Property{
+    id
+    type
+    location
+    area
+    distanceCEnter
+    propertyDescription
+    photograph
+}
+
+class Agent{}
+
+
+
+class Client{
+    id
+    name
+    email
+    phoneNumber
+}
+
+class Land{
+
+}
+
+class Apartment{
+    numberBedrooms
+    numberBedrooms
+    numberParking
+    equipment
+}
+
+class House{
+    numberBedrooms
+    numberBedrooms
+    numberParking
+    equipment
+    basement
+    loft
+    sunExposure
+}
+
+class Employee{
+    name
+    citizenCard
+    taxNumber
+    address
+    emailAddress
+    phoneNumber
+}
+
+class AnnouncementAvailable{
+    id
+    listingDate
+    comission
+    requestPrice
+    typeBusiness
+}
+
+class VisitRequest{
+    date
+    timeSlot
+    visitRequestOpinion
+}
+Property --> AnnouncementAvailable:is a physical part of
+Client --> AnnouncementAvailable:displays
+Client -->VisitRequest:submits
+Agent --> AnnouncementAvailable:publish
+Property <|-- Land
+Property <|-- Apartment
+Property <|-- House
+Employee <|-- Agent
+@enduml

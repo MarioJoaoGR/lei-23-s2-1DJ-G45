@@ -1,0 +1,150 @@
+@startuml
+skinparam monochrome true
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+autonumber
+
+'hide footbox
+actor "Client" as net
+participant ":AnswearAppointmentsUI" as UI
+participant ":AnswearAppointmentsController" as CTRL
+participant ":repositories:" as rep
+participant "Repository\n:Repository:" as ST
+participant "appointmentRequestRepository\n:AppointmentRequestRepository:" as STORE
+participant "usersAppointmentRequestList\n:List<AppointmentRequest>" as LIST
+participant "appointmentRequestMapper\n:AppointmentRequestMapper" as AMAP
+participant "userAppointmentRequestListDTO\n:List<AppointmentRequestDTO>" as LISTDTO
+participant "appointmentRequestDTO\n:AppointmentRequestDTO" as ADTO
+participant "emailSender\n:EmailSender" as EMAIL
+participant "appointmentRequest\n:AppointmentRequest" as APP
+
+
+activate net
+
+net -> UI : requests to read appointment requests answears
+
+activate UI
+UI -> CTRL** : create()
+
+UI-> CTRL: getAppointmentRequestList()
+activate CTRL
+
+
+CTRL -> rep:getInstance()
+activate rep
+rep-->CTRL:repositories
+deactivate rep
+CTRL -> ST: getAppointmentRequestRepository()
+activate ST
+ST-->CTRL:AppointmentRequestRepository
+deactivate ST
+CTRL->STORE:getUserRequests()
+activate STORE
+STORE-> LIST** : create()
+STORE->STORE:getAppointmentRequests()
+loop for each appointment request
+alt if appointmentRequest user = user
+STORE->LIST:add(AppointmentRequest)
+activate LIST
+LIST-->STORE:usersAppointmentRequestList
+deactivate LIST
+end
+end
+STORE->AMAP:toDTO(usersAppointmentRequestList)
+activate AMAP
+AMAP->LISTDTO**:create()
+
+loop for each AppointmentRequest
+AMAP->AMAP:toDTO(userAppointmentRequest)
+AMAP->ADTO**:create()
+AMAP->LISTDTO:add(AppointmentRequestDTO)
+activate LISTDTO
+LISTDTO-->AMAP:userAppointmentRequestListDTO
+deactivate LISTDTO
+end
+
+AMAP-->STORE:userAppointmentRequestListDTO
+deactivate
+STORE-->CTRL:userAppointmentRequestListDTO
+deactivate
+CTRL-->UI:userAppointmentRequestListDTO
+deactivate
+
+UI-->net:shows list of appointments
+
+deactivate UI
+net->UI:selects appointment
+activate UI
+UI->CTRL:sendEmail(agent,user)
+activate CTRL
+CTRL->STORE:sendEmail(agent,user)
+activate STORE
+STORE->EMAIL:sendEmail(agent,user)
+activate EMAIL
+deactivate
+deactivate
+deactivate
+UI-->net:shows appointment information(property, date, agent information)
+deactivate
+
+alt accepts appointment
+   net->UI:accepts appointment
+   activate UI
+   UI->CTRL:accept(appointmentDTO)
+   activate CTRL
+   CTRL->STORE:findAppointment(appointmentDTO)
+   activate STORE
+   STORE->STORE:getAppointmentRequestList()
+
+   loop for each appointment
+   alt if appointment = appointmentDTO
+   STORE-->CTRL:appointment
+   end
+   end
+   STORE->APP:setStatus(accepted)
+   activate APP
+   deactivate
+   deactivate
+   deactivate
+   deactivate
+   end
+   alt reject appointment
+   net->UI:reject appointment
+   activate UI
+   UI->CTRL:reject(appointmentDTO)
+   activate CTRL
+   CTRL->STORE:findAppointment(appointmentDTO)
+   activate STORE
+   STORE->STORE:getAppointmentRequestList()
+
+   loop for each appointment
+   alt if appointment = appointmentDTO
+   STORE-->CTRL:appointment
+   end
+   end
+   STORE->APP:setStatus(rejected)
+   activate APP
+   deactivate
+   deactivate
+   deactivate
+
+   UI->CTRL:sendEmail(agent,user)
+   activate CTRL
+   CTRL->STORE:sendEmail(agent,user)
+   activate STORE
+   STORE->EMAIL:sendEmail(agent,user)
+   activate EMAIL
+   deactivate
+   deactivate
+   deactivate
+   deactivate UI
+   end
+
+UI->net: informs operation success
+activate UI
+deactivate UI
+
+
+deactivate net
+@enduml

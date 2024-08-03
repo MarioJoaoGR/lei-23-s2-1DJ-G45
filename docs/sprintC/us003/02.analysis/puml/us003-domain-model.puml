@@ -1,0 +1,51 @@
+@startuml
+skinparam monochrome true
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+
+skinparam classAttributeIconSize 0
+
+hide circle
+hide methods
+
+title Domain Model US003 - Register a new employee
+
+
+class "System admin" as admin {}
+
+class Employee{
+    id
+    name
+    phoneNumber
+    email
+    civilNumber
+    taxNumber
+    password
+}
+
+class "System admin" as admin {}
+class agent {
+    agency
+}
+class "Store Manager" as SManager {}
+class "Network Manager" as NManager {}
+
+
+
+
+
+
+
+ Employee <|-- admin
+ Employee <|-- agent
+ Employee <|-- SManager
+ Employee <|-- NManager
+
+ admin "1" -up- "*" Employee : register new >
+
+
+
+
+
+@enduml

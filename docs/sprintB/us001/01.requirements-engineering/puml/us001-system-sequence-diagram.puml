@@ -1,0 +1,39 @@
+@startuml
+skinparam monochrome true
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+title US001 - System Sequence Diagram (SSD)
+
+autonumber
+
+actor "Unregistered User" as Uu
+
+participant ":System" as System
+
+activate Uu
+
+    Uu -> System : asks to search for properties
+    activate System
+
+        System --> Uu : asks to select data (type of business, property and  rooms)
+    deactivate System
+
+    Uu -> System : selects the requested data and confirm
+    activate System
+
+
+    System --> Uu: shows the list of properties
+    deactivate System
+
+
+    Uu -> System: asks to sort the list
+    activate System
+
+    System --> Uu : shows the list ordered
+    deactivate System
+
+
+
+
+@enduml

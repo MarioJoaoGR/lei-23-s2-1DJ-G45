@@ -1,0 +1,51 @@
+@startuml
+skinparam monochrome true
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+autonumber
+
+'hide footbox
+
+
+
+participant "announcementRepository\n:AnnouncementRepository" as AnnouncementRepo
+participant "announcementAvailable\n:AnnouncementAvailable" as Announcement
+participant "agent\n:Agent" as agent
+
+participant "visitRequest\n:VisitRequest" as visit
+participant "ListVisitRequest\n:List<VisitRequest>" as List
+
+
+
+             -> AnnouncementRepo : getVisitRequestListForAgent(email)
+                activate AnnouncementRepo
+                    AnnouncementRepo->List**:create
+
+                    loop for each Announcement
+                        AnnouncementRepo -> Announcement:getAllVisitRequestForAgent(email)
+                        activate Announcement
+                        Announcement -> agent: isAgent(email)
+                        activate agent
+                        agent --> Announcement : true/false
+                        deactivate
+                        alt isAgent(email) == true
+                            loop foreach visitRequest
+                                Announcement -> visit : isStateWaiting()
+                                activate visit
+                                visit -> visit : isDateBeforeToday()
+                                alt isStateWaiting == true && isDateBeforeToday == true
+                                    visit-->Announcement : visitRequest
+                                    deactivate
+                                    Announcement-->AnnouncementRepo:visitRequest
+                                    deactivate
+                                    AnnouncementRepo -> List: add(visitRequest)
+
+                                end
+                            end
+                        end
+                    end
+                    <--AnnouncementRepo : ListVisitRequest
+
+
+@enduml

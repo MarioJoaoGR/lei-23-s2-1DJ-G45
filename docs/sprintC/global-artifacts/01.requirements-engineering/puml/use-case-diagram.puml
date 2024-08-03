@@ -1,0 +1,54 @@
+@startuml
+'skinparam monochrome true
+skinparam packageStyle rectangle
+'skinparam shadowing false
+
+
+
+'title Use Case Diagram Example
+
+left to right direction
+
+actor "Unregistered User" as user
+actor Agent
+actor "System administrator" as admin
+actor Owner
+actor Client
+actor "Network manager" as manager
+
+
+rectangle System{
+usecase "US 001 - Display listed properties" as US001
+usecase "US 002 - Publish Sale" as US002
+usecase "US 003 - Register a new employee" as US003
+usecase "US 004 - Submit a request for listing a \nproperty sale or rent" as US004
+usecase "US 005 - Register a store" as US005
+usecase "US 007 - Register in the system" as US007
+usecase "US 008 - See agent requests and publish announcement" as US008
+usecase "US 009 - Register a store" as US009
+usecase "US 010 - Place an order to purchase the property" as US010
+usecase "US 011 - List real estate purchase orders to accept or decline a purchase order for a property" as US011
+usecase "US 012 - Import information from a legacy system" as US012
+usecase "US 013 - List all employees in every store" as US013
+usecase "US 014 - Register user in the system" as US014
+
+}
+
+
+
+user -- US001
+Agent -- US002
+admin -- US003
+Owner -- US004
+admin -- US005
+user -- US007
+Agent -- US008
+Client -- US009
+Client -- US010
+Agent -- US011
+admin -- US012
+manager-- US013
+Client-- US014
+
+
+@enduml

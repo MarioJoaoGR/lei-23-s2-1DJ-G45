@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.text.*?>
+<?import javafx.geometry.*?>
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="pt.ipp.isep.dei.esoft.project.ui.gui.SearchVisitRequestsUI">
+   <bottom>
+      <FlowPane alignment="CENTER" hgap="20.0" BorderPane.alignment="CENTER">
+         <children>
+            <Button fx:id="btnSearch" defaultButton="true" mnemonicParsing="false" onAction="#searchAction" />
+            <Button fx:id="btnCancel" mnemonicParsing="false" onAction="#cancelAction" />
+         </children>
+         <padding>
+            <Insets bottom="5.0" top="15.0" />
+         </padding>
+      </FlowPane>
+   </bottom>
+   <center>
+      <GridPane hgap="5.0" vgap="10.0" BorderPane.alignment="CENTER">
+        <columnConstraints>
+          <ColumnConstraints hgrow="SOMETIMES" maxWidth="204.0" minWidth="109.0" prefWidth="152.0" />
+          <ColumnConstraints hgrow="SOMETIMES" maxWidth="286.0" minWidth="191.0" prefWidth="243.0" />
+        </columnConstraints>
+        <rowConstraints>
+          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+        </rowConstraints>
+         <children>
+            <Label fx:id="lblStartDate" GridPane.halignment="RIGHT" />
+            <Label fx:id="lblEndDate" GridPane.halignment="RIGHT" GridPane.rowIndex="1">
+               <font>
+                  <Font name="System Bold" size="13.0" />
+               </font>
+            </Label>
+            <DatePicker fx:id="dateStart" GridPane.columnIndex="1" />
+            <DatePicker fx:id="dateEnd" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+         </children>
+         <padding>
+            <Insets bottom="10.0" top="10.0" />
+         </padding>
+      </GridPane>
+   </center>
+   <padding>
+      <Insets right="10.0" />
+   </padding>
+</BorderPane>

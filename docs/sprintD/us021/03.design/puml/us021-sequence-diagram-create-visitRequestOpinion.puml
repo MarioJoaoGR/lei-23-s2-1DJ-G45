@@ -1,0 +1,45 @@
+@startuml
+skinparam monochrome true
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+autonumber
+
+'hide footbox
+
+
+participant ":AnnouncementController" as controller
+
+participant "visitRequestMapper\n:VisitRequestMapper" as mapper
+
+participant "visitRequest\n:VisitRequest" as visit
+
+participant "visitRequestOpinion\n:VisitRequestOpinion" as opinion
+
+activate controller
+    controller->mapper: fromDTO(visitRequestDTO)
+                    activate mapper
+                    mapper->visit:create(VisitRequestDTO)
+                    activate visit
+                    visit-->mapper: (VisitRequest)
+                    deactivate
+                    mapper-->controller:visitRequest
+                    deactivate
+
+    controller -> visit:create(opinion,classification)
+    activate visit
+    visit -> opinion : create(opinion,classification)
+    activate opinion
+    deactivate
+    visit->visit:addVisitRequestOpinion(visitRequestOpinion)
+    visit->controller:success
+    deactivate
+
+    <--controller:success message
+    deactivate controller
+
+
+
+
+
+@enduml

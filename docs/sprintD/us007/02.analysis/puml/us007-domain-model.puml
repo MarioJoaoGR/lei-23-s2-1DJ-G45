@@ -1,0 +1,66 @@
+@startuml
+skinparam monochrome true
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+
+skinparam classAttributeIconSize 0
+
+hide circle
+hide methods
+
+title Domain Model US007 - Register in the system
+
+
+
+class Client{
+    id
+    name
+    phoneNumber
+    email
+}
+
+class "Unregistered User" as UU {}
+
+class Announcement{
+id
+listingDate
+comission
+requestPrice
+}
+
+
+class Property{
+propertyID
+type
+location
+area
+distanceCenter
+propertyDescription
+photograph
+}
+
+class Sale{
+soldPrice
+}
+
+class Lease{
+RentPrice
+ContractDate
+}
+
+UU "1" - "1"  Client : can become >
+UU "1" -- "*" Announcement : displays >
+
+Client "1" -- "*" Announcement : displays >
+Property "1" -left- "1" Announcement: is the physical part of >
+Property "1" -up-- "1" Sale : is >
+Property "1" -up- "1" Lease : is >
+Lease "1" -- "1" Client : To >
+Sale "1" - "1" Client : To >
+
+
+
+
+
+@enduml

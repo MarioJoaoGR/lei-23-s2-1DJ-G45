@@ -1,0 +1,54 @@
+@startuml
+skinparam monochrome true
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+
+skinparam classAttributeIconSize 0
+
+hide circle
+hide methods
+
+
+
+class "Agency" as stores{
+
+
+}
+
+
+
+
+
+class Announcement{
+id
+listingDate
+comission
+requestPrice
+}
+
+
+class Property{
+propertyID
+type
+location
+area
+distanceCenter
+propertyDescription
+photograph
+}
+
+
+
+
+stores "1" -- "1.*" Announcement : is composed by >
+
+Property "1" -right- "1" Announcement: is the physical part of >
+
+
+
+
+
+
+
+@enduml

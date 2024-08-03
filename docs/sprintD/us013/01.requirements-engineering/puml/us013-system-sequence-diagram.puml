@@ -1,0 +1,19 @@
+@startuml
+    skinparam monochrome true
+    skinparam packageStyle rectangle
+    skinparam shadowing false
+
+    title US013 - System Sequence Diagram
+
+    actor "Network Manager" as NM
+    participant ":System" as System
+
+
+
+    activate System
+    activate NM
+        NM -> System : Asks to list employees in every store
+        System -> NM : Display employee list grouped by store
+    deactivate NM
+    deactivate System
+@enduml

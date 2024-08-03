@@ -1,0 +1,109 @@
+@startuml
+skinparam monochrome true
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+autonumber
+
+'hide footbox
+actor "Unregistered User" as UU
+participant ":SearchUI" as UI
+participant ":ListingController" as CTRL
+participant ":Repositories" as REPO
+participant "repositories:\nRepositories" as rep
+
+participant "announcementRepository:\nAnnouncementRepository" as AnnouncementRepo
+participant "announcement:\nAnnouncement" as Announcement
+participant "property:\nProperty" as prop
+
+participant "property:\nProperty" as prop
+
+participant "land:\nLand" as land
+participant "apartment:\nApartment" as apart
+participant "house:\nHouse" as house
+
+
+
+
+activate UU
+
+        UU -> UI : asks to search for properties
+
+        activate UI
+
+              UI -> CTRL**:create
+'            UI --> UU : requests data (reference, description,  informal \n description, technical description, duration, cost)
+            'create CTRL
+
+        UI --> UU : requests data
+    deactivate UI
+
+    UU -> UI : selects the requested data and confirm
+    activate UI
+        UI -> UI : verifies data
+
+        UI -> CTRL : getPropertyList(business,type, rooms)
+        activate CTRL
+
+            CTRL -> REPO: getInstance()
+                        activate REPO
+
+            REPO --> CTRL : Repositories
+            deactivate REPO
+
+            CTRL -> rep: getListingRepository()
+                        activate rep
+
+            rep --> CTRL : ListingRepository
+            deactivate rep
+
+            CTRL -> AnnouncementRepo: getPropertyList (business, type, rooms)
+            activate AnnouncementRepo
+
+                ref over AnnouncementRepo
+                    Get PropertyList
+                end
+
+                AnnouncementRepo -> AnnouncementRepo: sortByRecent(propertyList)
+
+
+
+            AnnouncementRepo --> CTRL : PropertyList
+            deactivate AnnouncementRepo
+
+
+        CTRL --> UI : PropertyList
+        deactivate CTRL
+
+        UI --> UU : shows the Announcement of properties
+        deactivate UI
+
+        UU -> UI : asks to sort the Announcement
+
+        activate UI
+
+        UI-->UU: shows the Announcement of types of sort
+        UU->UI:selects a type of sort
+        
+        UI -> CTRL: getPropertyList()
+        
+        activate CTRL
+        ref over CTRL
+            Get PropertyList Sorted
+        end
+
+        CTRL-->UI:PropertyListOrdered
+        deactivate CTRL
+
+        UI --> UU:shows the Announcement ordered
+
+
+
+
+
+
+        deactivate UI
+
+deactivate UU
+
+@enduml

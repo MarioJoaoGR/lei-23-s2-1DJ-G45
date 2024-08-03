@@ -1,0 +1,61 @@
+@startuml
+skinparam monochrome true
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+title US017 - System Sequence Diagram (SSD)
+autonumber
+
+actor "System Network Manager" as SystemNetworkManager
+participant ":System" as System
+
+activate SystemNetworkManager
+
+   SystemNetworkManager -> System : asks to list all deals made
+    activate System
+
+    System --> SystemNetworkManager : Shows the list unsorted and asks if he wants to sort it
+
+    opt Chooses to sort or not to sort
+
+    opt
+    
+        SystemNetworkManager->System : asks to sort the list
+    
+
+
+                System --> SystemNetworkManager : asks what algorithm he wants to use to sort the list
+
+
+
+
+               SystemNetworkManager -> System: selects the algorithm he wants to use to sort the list
+
+                
+
+
+
+            System --> SystemNetworkManager : ask how he wants the list to be sorted
+
+
+
+
+            SystemNetworkManager -> System: selects the way he wants the list to be sorted
+
+            alt Sort type == ascending area
+                System --> SystemNetworkManager: shows the list of deals ordered by ascending area in square feet
+
+                else Sort type == descending area
+                    System --> SystemNetworkManager: shows the list of deals ordered by descending area in square feet
+            deactivate
+            end
+
+
+
+
+
+
+        end
+
+
+@enduml

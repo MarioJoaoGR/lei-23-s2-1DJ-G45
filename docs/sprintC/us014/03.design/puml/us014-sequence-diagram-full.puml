@@ -1,0 +1,210 @@
+@startuml
+skinparam monochrome true
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+autonumber
+
+'hide footbox
+actor "Client" as client
+participant ":CheckScheduleVisitUI" as UI
+participant ":AnnouncementController" as CTRL
+participant ":Repositories" as REPO
+participant "repositories:\nRepositories" as rep
+participant "announcementRepository:\nAnnouncementRepository" as AnnouncementRepo
+participant "authenticationRepository" as repo1
+participant "AuthenticationFacade" as facade
+participant "currentSession:\nUserSession" as session
+participant "announcementAvailable:\nAnnouncementAvailable" as Announcement
+
+
+
+
+
+participant "announcementMapper\n:AnnouncementMapper" as announcementMapper
+participant "orderMapper:\nOrderMapper" as orderMapper
+
+participant "ListAnnouncementAvailable\n:List<AnnouncementAvailable" as List
+participant "ListAnnouncementAvailableDTO\n:List<AnnouncementAvailableDTO" as ListDTO
+
+participant "announcementDTO\n:AnnouncementDTO" as announcementDTO
+
+activate client
+
+    client -> UI : ask to check scheduleVisits
+    activate UI
+        UI -> CTRL**:create
+        UI -> CTRL : getScheduleVisits
+    activate CTRL
+    deactivate UI
+
+
+                      CTRL -> REPO : getInstance()
+                        activate REPO
+                       REPO -> CTRL : Repositories
+                        deactivate REPO
+                        activate rep
+                         CTRL -> rep : getAuthenticationRepository()
+                                      rep -> CTRL : authenticationRepository
+                      deactivate rep
+
+
+                CTRL -> repo1 : checkIfIsLoggged()
+                activate repo1
+                          deactivate CTRL
+
+                              repo1 -> session : getCurrentUserSession()
+                              activate session
+                              session -> repo1 : userSession
+                              deactivate session
+
+                              repo1 -> facade : isLoggedIn()
+                              activate facade
+                              facade -> repo1 : boolean
+                              deactivate facade
+                            repo1 -> CTRL : boolean
+
+                            activate CTRL
+                            deactivate repo1
+                            alt boolean==true
+
+                               CTRL -> REPO : getInstance()
+
+                              activate REPO
+                                REPO -> CTRL : Repositories
+
+                                 deactivate REPO
+                                 activate rep
+                                  CTRL -> rep : getAuthenticationRepository()
+                                               rep -> CTRL : authenticationRepository
+                                        CTRL -> rep : getCurrentUserSession
+                                        rep -> CTRL : userSession
+                                        deactivate rep
+
+                                        CTRL -> facade : getUserId()
+                                         activate facade
+                                        facade -> CTRL : userId
+                                    deactivate facade
+
+                              activate REPO
+                              CTRL -> REPO : getInstance()
+                              REPO -> CTRL : Repositories
+                              deactivate REPO
+
+
+                              CTRL -> rep : getAnnouncementRepository()
+                               activate rep
+
+                              rep -> CTRL : announcementRepository
+                              deactivate rep
+
+
+                              CTRL ->AnnouncementRepo : getAnnouncementWithVisitRequestsForOwnerByID(userId)
+                                activate AnnouncementRepo
+                              AnnouncementRepo -> CTRL : AnnouncementList
+                              deactivate AnnouncementRepo
+                              ref over CTRL
+                              AnnouncementListToDTO
+                              end
+                              CTRL -> UI : listAnnouncementsDTO
+                              deactivate CTRL
+                              activate UI
+                              UI -> client : shows every announcement with visit requests made, and all the time slots
+                              UI -> client : asks if wants to accpet/reject/counterpurpose any  visitRequests
+
+                                opt yes
+                              UI -> client : choose a time slot of a visitRequest that you want to accpect/reject/counterPurpose
+                                opt accpet
+                                UI -> CTRL : accpetVisitRequest(AnnouncementDTO,VisitRequestDTO,timeSLot)
+                                activate CTRL
+                                deactivate UI
+
+                                CTRL -> REPO : getInstance()
+                                activate REPO
+                                REPO -> CTRL : Repositories
+                                deactivate REPO
+                                activate rep
+                                CTRL -> rep : getAnnouncementRepository()
+
+                                rep -> CTRL : announcementRepository
+
+                                deactivate rep
+                                activate AnnouncementRepo
+                                CTRL ->AnnouncementRepo : acceptVisitRequestMethod(AnnouncementDTO,VisitRequestDTO,timeSlot)
+                                deactivate AnnouncementRepo
+                                end
+                                deactivate CTRL
+
+                                opt reject
+                                 UI -> CTRL : rejectVisitRequest(AnnouncementDTO,VisitRequestDTO,timeSLot)
+                                 activate CTRL
+                                 activate UI
+                                 deactivate UI
+                                 activate REPO
+                                 CTRL -> REPO : getInstance()
+                                 REPO -> CTRL : Repositories
+                                 deactivate REPO
+                                 activate rep
+                                 CTRL -> rep : getAnnouncementRepository()
+                                 rep -> CTRL : announcementRepository
+                                 deactivate rep
+                                 CTRL ->AnnouncementRepo : rejectVisitRequestMethod(AnnouncementDTO,VisitRequestDTO,timeSlot)
+                                 activate AnnouncementRepo
+                                 deactivate AnnouncementRepo
+                                 end
+
+                                deactivate CTRL
+                                opt counterpurpose
+                                loop until wants to add more dates with time slots for counterpurpose
+
+                                UI -> client : request Date(xx-yy-zzzz)
+                                activate UI
+                                client-> UI : types Date
+
+                                loop while wants to add more time slots
+                                    UI-> client : request time slots(x hour to y hour format)
+                                    client -> UI : types x
+                                    client -> UI : types y
+                                    end
+                                UI -> CTRL :counterPurpose(VisitRequestDTO,AnnouncementDTO)
+                                activate CTRL
+                                end
+                                deactivate UI
+                              activate REPO
+                               CTRL -> REPO : getInstance()
+                               REPO -> CTRL : Repositories
+                               deactivate REPO
+                               activate rep
+                               CTRL -> rep : getAnnouncementRepository()
+                               rep -> CTRL : announcementRepository
+                               deactivate rep
+                               CTRL ->AnnouncementRepo : counterPurposeVisitRequestMethod(AnnouncementDTO,VisitRequestDTO,timeSlotsList)
+                                activate AnnouncementRepo
+                                deactivate CTRL
+                                deactivate AnnouncementRepo
+
+                              end
+
+                              UI -> client : shows success message
+                                activate UI
+                                deactivate UI
+                            end
+
+                            else boolean == false
+                              UI -> client : insucess message
+                                activate UI
+                                deactivate UI
+                            end
+
+
+
+
+
+
+
+
+
+
+
+
+@enduml

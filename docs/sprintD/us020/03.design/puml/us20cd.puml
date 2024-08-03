@@ -1,0 +1,81 @@
+@startuml
+'skinparam monochrome true
+skinparam packageStyle rectangle
+skinparam shadowing false
+skinparam linetype polyline
+'skinparam linetype orto
+
+skinparam classAttributeIconSize 0
+
+'left to right direction
+
+class AnswearAppointmentController {
++getAppointmentRequestList()
++sendEmail(Agent agent,Client user)
+}
+
+
+class Repositories{
+    - Repositories()
+    + getInstance()
+    + getAppointmentRequestRepository()
+    +findAppointment(AppointmentRequestDTO appointmentDTO)
+}
+
+class AppointmentRequestRepository{
++getUserRequests()
+-getAppointmentRequests()
++sendEmail(Agent agent,Client user)
+-usersAppointmentRequestList
+}
+
+
+
+class AppointmentRequest{
+-agent
+-date
+-announcement
+-status
+-Client
++setStatus()
+}
+
+class EmailSender{
++sendEmail(Agent agent,Client user)
+}
+
+class AnswearAppointmentUI {
+}
+
+class AppointmentRequestDTO{
+-agent
+-date
+-announcement
+-status
+-Client
+}
+
+class AppointmentRequestMapper{
++toDTO(List<AppointmentRequest> usersAppointmentRequestList)
+-toDTO(AppointmentRequest appointmentRequest)
+-usersAppointmentRequestListDTO
+}
+
+
+
+
+AnswearAppointmentUI ..> AnswearAppointmentController
+AnswearAppointmentController ..> Repositories
+Repositories-->AppointmentRequestRepository
+
+AppointmentRequestRepository-->AppointmentRequest
+Repositories-->Repositories
+
+
+AnswearAppointmentController..>AppointmentRequestRepository
+AnswearAppointmentController..>AppointmentRequestMapper
+AppointmentRequestMapper..>AppointmentRequestDTO
+AppointmentRequestRepository..>EmailSender
+
+
+@enduml

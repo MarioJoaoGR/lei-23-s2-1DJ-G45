@@ -1,0 +1,57 @@
+@startuml
+skinparam monochrome true
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+autonumber
+
+'hide footbox
+actor "Registered User" as user
+participant ":SearchUI" as UI
+
+
+
+activate user
+            user -> UI : ask to search for properties
+            activate UI
+            UI --> user: shows the list of properties
+            deactivate UI
+
+            opt ask to order the list
+                user -> UI : ask to order the Announcement list
+                activate UI
+                        UI-->user: shows the Announcement of types of sort
+                        deactivate
+                        user->UI:selects a type of sort
+                        activate UI
+
+
+                UI --> user: shows the list of properties ordered
+                deactivate UI
+            end
+
+            user -> UI : Selects an Announcement
+            activate UI
+
+            UI --> user: shows the Announcement chosed with all information
+
+
+            user -> UI : asks to schedule a visit for that announcement chosed
+            loop until wants to add more dates with time slots
+            UI -> user : request Date(xx-yy-zzzz)
+            user-> UI : types Date
+            loop while wants to add more time slots
+                UI-> user : request time slots(x hour to y hour format)
+                user -> UI : types x
+                user -> UI : types y
+                end
+            end
+                    deactivate UI
+
+                        UI -> user : shows operation success/insuccess
+                    activate UI
+                    deactivate UI
+deactivate user
+
+@enduml
+

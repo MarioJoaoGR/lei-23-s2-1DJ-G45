@@ -1,0 +1,98 @@
+@startuml
+'skinparam monochrome true
+skinparam packageStyle rectangle
+skinparam shadowing false
+skinparam linetype polyline
+'skinparam linetype orto
+
+skinparam classAttributeIconSize 0
+
+'left to right direction
+
+class "RegisterEmployeeController" as ctrl{
+
+
+    + RegisterEmployeeController(AgencyRepository, AuthenticationRepository)
+    + getAgencysFromController()
+    + addEmployeeToSystem(String name, String mail, String password, String role)
+    + generatePassword()
+
+
+
+}
+
+class AgencyRepository {
+    + getAgencyList()
+}
+class AuthenticationRepository {
+    addUserWithRole(String name, String email, String pwd, String roleId)
+}
+
+
+
+
+class StoreNetworkManager {
+    -Role
+}
+
+
+class Agent {
+    -Agency agencia;
+    -String ROLE
+}
+
+
+class StoreManager {
+-Role
+
+}
+class SystemAdmin {
+-Role
+
+}
+
+class Employee {
+         -int id
+         -String name
+         -int phoneNumber
+         -int taxNumber
+         -String password
+         -int civilNumber
+         -String address;
+         -String mail;
+}
+
+class RegisterEmployeeUI {
+}
+
+class Repositories {
+    - Repositories()
+    + getInstance() : Repositories
+    + getAgencyRepository()
+    + getAuthenticationRepository()
+}
+
+
+
+RegisterEmployeeUI .> ctrl
+
+ctrl .> AuthenticationRepository
+ctrl .> AgencyRepository
+ctrl .-> Repositories
+ctrl .-> Employee
+
+class Agent extends Employee
+class StoreManager extends Employee
+class StoreNetworkManager extends Employee
+class SystemAdmin extends Employee
+
+
+Repositories -> Repositories : instance
+
+AgencyRepository --> Agencies : has
+Agencies --> Employee : are workstations for
+AuthenticationRepository --> Employee : needs to be authenticated in the system
+
+Employee --> SystemAdmin : are registered by
+
+@enduml

@@ -1,0 +1,34 @@
+@startuml
+skinparam monochrome true
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+autonumber
+
+@startuml
+skinparam monochrome true
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+title US016 - System Sequence Diagram (SSD)
+autonumber
+
+actor "Agent" as agent
+participant ":System" as UI
+
+
+activate UI
+ref over  agent
+listAllVisitRequests
+end
+
+activate agent
+agent -> UI : asks to respond to a visit request sendind an email
+UI -> agent: asks if it wants to accept or reject the visit request
+agent -> UI : selects an option
+
+UI -> agent : shows operationSuccess
+deactivate UI
+
+
+@enduml

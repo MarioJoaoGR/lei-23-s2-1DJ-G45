@@ -1,0 +1,38 @@
+@startuml
+skinparam monochrome true
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+title System Sequence Diagram (SSD) - Alternative One
+
+autonumber
+
+actor "Client" as Client
+participant ":System" as System
+
+activate Client
+
+    Client -> System : requests to read appointment requests answers
+    activate System
+    System --> Client : shows list of appointments
+    deactivate System
+
+    Client ->System : selects appointment
+    activate System
+    System-->Client: shows appointment information(property, date, agent information)
+    deactivate System
+
+    alt accepts appointment
+    Client->System: accepts appointment
+    activate System
+    end
+
+
+     alt rejects appointment
+     Client->System: specifys reason why the appointment was rejected
+    end
+
+
+    System-->Client: operation success
+    deactivate System
+@enduml

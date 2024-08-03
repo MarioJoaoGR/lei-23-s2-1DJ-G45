@@ -1,0 +1,33 @@
+@startuml
+skinparam monochrome true
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+title US007 - System Sequence Diagram (SSD)
+autonumber
+
+actor "System administrator" as admin
+participant ":System" as System
+
+activate admin
+
+    admin -> System : asks to register in the system
+    activate System
+
+    System --> admin: shows a registration form and requests data
+
+
+    deactivate System
+
+    admin -> System : types the data(Name, email and password) and confirm
+    activate System
+
+    System->System: validates the data
+    System->System: Add user
+
+
+        System --> admin : Show a success message
+        deactivate System
+
+
+@enduml

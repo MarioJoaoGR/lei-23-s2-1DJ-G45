@@ -1,0 +1,86 @@
+@startuml
+skinparam monochrome true
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+
+skinparam classAttributeIconSize 1
+
+hide circle
+hide methods
+
+title Domain Model US002 - Publish any sale announcement
+
+
+
+class Agent {
+    agency
+}
+
+class Employee{
+    id
+    name
+    phoneNumber
+    email
+    civilNumber
+    taxNumber
+    password
+}
+
+class Owner {
+    name
+    email
+    phoneNumber
+    civilNumber
+}
+
+class Announcement{
+    id
+    listingDate
+    comission
+    requestPrice
+}
+
+class Property{
+    propertyID
+    type
+    location
+    area
+    distanceCenter
+    propertyDescription
+    photograph
+}
+
+class Land{}
+
+class Apartment{
+    numberBedrooms
+    numberBath
+    numberParking
+    equipment
+
+}
+
+class House{
+    numberBedrooms
+    numberBath
+    numberParking
+    equipment
+    basement
+    loft
+    sunExposure
+}
+
+
+Agent "1" -right- "*" Announcement : publish >
+Property "1" -left- "1" Announcement : is a physical part of >
+Owner "1" -left- "1" Property: own >
+
+class Land extends Property
+class Apartment extends Property
+class House extends Property
+
+Agent --|> Employee
+
+
+@enduml

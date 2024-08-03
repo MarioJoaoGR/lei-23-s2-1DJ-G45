@@ -1,0 +1,54 @@
+@startuml
+'skinparam monochrome true
+skinparam packageStyle rectangle
+skinparam shadowing false
+skinparam linetype polyline
+'skinparam linetype orto
+
+skinparam classAttributeIconSize 0
+
+'left to right direction
+
+class RegisterStoreUI
+
+class RegisterStoreController{
++registerstore (ID;designation;location;localmanager;emailaddress;telephonenumber)
+}
+
+class Repositories {
+    - Repositories()
+    + getInstance() : Repositories
+    + getStoreRepository()
+}
+
+class Agency{
+}
+class AgencyRepository{
+    -ID
+    -designation
+    -location
+    -localmanager
+    -telephonenumber
+    -emailaddress
+
+    +validatestore(ID;designation;location;localmanager;emailaddress;telephonenumber)
+    +addstore(ID;designation;location;localmanager;emailaddress;telephonenumber)
+    }
+
+
+RegisterStoreController -|> Store
+
+RegisterStoreUI .> RegisterStoreController
+
+RegisterStoreController .> AgencyRepository
+RegisterStoreController .-> Repositories
+RegisterStoreController .-> Agency
+
+Repositories -> Repositories : instance
+
+AgencyRepository --> Agency
+
+Agency --> Store  : registers
+
+
+@enduml

@@ -1,0 +1,117 @@
+@startuml
+skinparam monochrome true
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+autonumber
+
+@startuml
+skinparam monochrome true
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+title US016 - System Sequence Diagram (SSD)
+autonumber
+
+actor "Agent" as agent
+participant ":RespondsVisitRequestUI" as UI
+participant ":AnnouncementCtrl" as CTRL
+participant ":Repositories" as REPO
+participant "repositories:\nRepositories" as rep
+participant "VisitRequest" as vr
+participant "SendEmail" as sendMail
+participant "Agent" as agentClass
+participant "AnnouncementAvailable" as aAvai
+participant "Property" as property
+
+
+activate UI
+ref over  agent
+listAllVisitRequests
+end
+
+activate agent
+agent -> UI : asks to respond to a visit request sendind an email
+UI -> agent: asks if wants to accept or reject the visit request
+agent -> UI : selects option
+UI --> CTRL : create
+opt accept
+UI -> CTRL : acceptVisitRequest(VisitRequest)
+activate CTRL
+CTRL -> vr : setStatus("accepted")
+activate vr
+deactivate vr
+
+CTRL -> aAvai : updatingVisitRequests()
+activate aAvai
+deactivate aAvai
+
+deactivate CTRL
+deactivate UI
+end
+
+
+
+opt reject
+
+UI -> CTRL : rejectVisitRequest(VisitRequest)
+activate UI
+deactivate UI
+activate CTRL
+CTRL -> vr : setStatus("rejected")
+activate vr
+deactivate vr
+
+
+CTRL -> aAvai : updatingVisitRequests()
+activate aAvai
+deactivate aAvai
+
+
+
+end
+
+
+CTRL -> vr : getAgentName()
+activate vr
+deactivate CTRL
+vr -> agentClass : getName()
+activate agentClass
+agentClass -> vr : agentName
+
+deactivate agentClass
+vr -> CTRL : agentName
+deactivate vr
+activate CTRL
+CTRL -> aAvai : getPropertyInfo()
+deactivate CTRL
+activate aAvai
+aAvai -> property : getInfo()
+activate property
+property -> aAvai : info
+
+deactivate property
+activate CTRL
+aAvai -> CTRL : info
+deactivate aAvai
+
+CTRL -> vr : getEmailToSendMessage
+activate vr
+vr -> CTRL : emailToSendMessage
+CTRL -> vr : getVisitRequestResponse
+vr -> CTRL  : visitRequestResponse
+deactivate vr
+
+CTRL -> CTRL : message = visitRequestResponse(accept/rejected),ownerName,info
+CTRL -> sendMail: sendMail(emailToSendMessage, messageToSend)
+activate sendMail
+sendMail -> CTRL : operationSuccess
+deactivate sendMail
+CTRL -> UI : operationSuccess
+activate UI
+deactivate CTRL
+UI -> agent : shows operationSuccess
+deactivate UI
+
+
+@enduml

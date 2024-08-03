@@ -1,0 +1,133 @@
+@startuml
+skinparam monochrome true
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+participant ":AnnouncementController" as CTRL
+participant ":Repositories" as REPO
+participant "repositories:\nRepositories" as rep
+participant "announcementRepository:\nAnnouncementRepository" as AnnouncementRepo
+participant "announcementAvailable:\nAnnouncementAvailable" as Announcement
+
+participant "property:\nProperty" as prop
+participant "land:\nLand" as land
+participant "apartment:\nApartment" as apart
+participant "house:\nHouse" as house
+
+
+participant "announcementMapper\n:AnnouncementMapper" as announcementMapper
+
+participant "ListAnnouncementAvailable\n:List<AnnouncementAvailable" as List
+participant "ListAnnouncementAvailableDTO\n:List<AnnouncementAvailableDTO" as ListDTO
+
+participant "announcementDTO\n:AnnouncementDTO" as announcementDTO
+
+
+autonumber 9
+-> CTRL : getAnnouncementList (business, type, rooms)
+            activate CTRL
+autonumber 9.1
+
+                CTRL -> REPO: getInstance()
+                  activate REPO
+
+                REPO --> CTRL : Repositories
+                deactivate REPO
+
+                CTRL -> rep: getAnnouncementRepository()
+                            activate rep
+
+                rep --> CTRL : AnnouncementRepository
+                deactivate rep
+
+                CTRL -> AnnouncementRepo: getAnnouncementList (business, type, rooms)
+                activate AnnouncementRepo
+
+
+
+                         AnnouncementRepo -> Announcement: filterAnnouncementsAvailable(business,type,rooms)
+
+                         activate Announcement
+
+
+                         Announcement->List**:create()
+
+                         loop foreach AnnouncementAvailable
+
+                             Announcement -> Announcement : isAnnouncementBusiness(business)
+
+                            Announcement -> prop : isType(type)
+
+
+                            activate prop
+
+                            prop --> Announcement : true/false
+
+                            deactivate
+
+                            alt type=apartment
+
+                                Announcement -> apart : numberRooms(rooms)
+                                activate apart
+
+                                apart --> Announcement : true/false
+
+                                deactivate apart
+                                else type=house
+                                    Announcement -> house : numberRooms(rooms)
+                                    activate house
+
+                                    house --> Announcement : true/false
+
+                                    deactivate house
+                            end
+
+                            alt isAnnouncementBusiness && isType && numberRooms
+                                Announcement-> List: add(Announcement)
+                            end
+
+                            end
+
+                            Announcement --> AnnouncementRepo : ListAnnouncementAvailable
+                            deactivate Announcement
+
+                            AnnouncementRepo --> CTRL : ListAnnouncementAvailable
+                            deactivate AnnouncementRepo
+
+
+
+                           CTRL -> announcementMapper:toDto(ListAnnouncementAvailable)
+                            activate announcementMapper
+
+                                announcementMapper->ListDTO**:createDTO
+                                loop foreach object of the List
+                                announcementMapper -> List : get(i)
+                                activate List
+                                List --> announcementMapper : AnnouncementAvailable
+                                deactivate List
+
+                                announcementMapper -> announcementMapper : toDto(AnnouncementAvailable)
+                                activate announcementMapper
+                                announcementMapper-> announcementDTO** : create(AnnouncementAvailable)
+                                deactivate
+                                announcementMapper --> ListDTO : add(AnnouncementDTO)
+                                activate ListDTO
+                                deactivate
+
+                                end
+
+
+
+                                announcementMapper --> CTRL : ListAnnouncementDTO
+                            deactivate
+                         deactivate Announcement
+
+
+                deactivate AnnouncementRepo
+
+autonumber 10
+
+            <-- CTRL : ListAnnouncementDTO
+            deactivate CTRL
+
+@enduml

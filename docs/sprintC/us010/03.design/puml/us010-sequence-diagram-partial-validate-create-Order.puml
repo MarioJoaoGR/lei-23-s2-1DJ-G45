@@ -1,0 +1,61 @@
+@startuml
+skinparam monochrome true
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+
+participant ":AnnouncementController" as CTRL
+
+
+participant "announcementAvailable:\nAnnouncementAvailable" as Announcement
+participant "order:\nOrder" as order
+
+autonumber 25.9
+
+ CTRL -> Announcement : validateOrder(value)
+ activate CTRL
+                 activate Announcement
+                     Announcement -> Announcement: isValueHigherThanPrice()
+                     Announcement -> Announcement: isAnotherOrderByClient()
+                     Announcement -> Announcement: isAnotherOrderWithSameValue()
+
+
+
+                 alt isValueHigherThanPrice()==true
+                     Announcement --> CTRL: insucess message
+
+                     <--CTRL:insucess message
+                 else isAnotherOrderByClient()==true
+                     Announcement --> CTRL: insucess message
+
+                     <--CTRL:insucess message
+
+                 else isAnotherOrderWithSameValue()==true
+                     Announcement --> CTRL: shows a insucess message and the order that already exist
+                     deactivate
+
+                     <--CTRL:shows a insucess message and the order that \n already exist
+
+                 end
+
+
+
+
+                 CTRL-> order** : create(email,value)
+                 CTRL-> Announcement: createOrder(announcementAvailable,Order)
+
+                 activate Announcement
+
+                  Announcement -> Announcement : addOrder(order)
+                  activate Announcement
+
+                  deactivate Announcement
+
+                 Announcement --> CTRL: success message
+
+                 deactivate Announcement
+
+             <--CTRL: success message
+
+
+@enduml

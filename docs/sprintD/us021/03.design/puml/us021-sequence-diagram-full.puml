@@ -1,0 +1,198 @@
+@startuml
+skinparam monochrome true
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+autonumber
+
+'hide footbox
+
+
+actor "Agent" as actor
+participant ":RespondsVisitRequestOpinionUI" as UI
+participant ":AnnouncementController" as controller
+participant "ApplicationSession" as appSession
+participant "appSession\n:ApplicationSession" as app
+participant "currentSession\n:UserSession" as session
+participant ":Repositories" as REPO
+participant "repositories\n:Repositories" as rep
+participant "announcementRepository\n:AnnouncementRepository" as AnnouncementRepo
+participant "announcementAvailable\n:AnnouncementAvailable" as Announcement
+participant "agent\n:Agent" as agent
+participant "visitRequestMapper\n:VisitRequestMapper" as mapper
+
+participant "visitRequest\n:VisitRequest" as visit
+participant "ListVisitRequest\n:List<VisitRequest>" as List
+participant "ListVisitRequestDTO\n:List<VisitRequestDTO>" as ListDTO
+participant "visitRequestDTO\n:VisitRequestDTO" as DTO
+participant "visitRequestOpinion\n:VisitRequestOpinion" as opinion
+
+
+activate actor
+actor -> UI : asks to register the visit and the opinion about the business
+    activate UI
+
+    UI -> controller**: create
+
+
+    UI -> controller: getAllVisitRequestListForAgent()
+    activate controller
+    controller -> controller : getClientFromSession()
+        activate controller
+        controller->appSession: getInstance()
+        activate appSession
+        appSession-->controller : appSession
+        deactivate
+
+        controller->app: getCurrentSession()
+        activate app
+        app-->controller : currentSession
+        deactivate
+
+        controller->session: getClientEmail()
+        activate session
+        session-->controller : email
+            deactivate session
+            controller -> controller : email
+        deactivate controller
+
+            controller -> controller : getAnnouncementRepository()
+            activate controller
+            controller -> REPO: getInstance()
+              activate REPO
+
+            REPO --> controller : Repositories
+            deactivate REPO
+
+            controller -> rep: getAnnouncementRepository()
+                        activate rep
+
+            rep --> controller : AnnouncementRepository
+            deactivate rep
+            controller->controller:AnnouncementRepository
+            deactivate controller
+            controller -> AnnouncementRepo : getVisitRequestListForAgent(email)
+                activate AnnouncementRepo
+                    AnnouncementRepo->List**:create
+
+                    loop for each Announcement
+                        AnnouncementRepo -> Announcement:getAllVisitRequestForAgent(email)
+                        activate Announcement
+                        Announcement -> agent: isAgent(email)
+                        activate agent
+                        agent --> Announcement : true/false
+                        deactivate
+                        alt isAgent(email) == true
+                            loop foreach visitRequest
+                                Announcement -> visit : isStateWaiting()
+                                activate visit
+                                visit -> visit : isDateBeforeToday()
+                                alt isStateWaiting == true && isDateBeforeToday == true
+                                    visit-->Announcement : visitRequest
+                                    deactivate
+                                    Announcement-->AnnouncementRepo:visitRequest
+                                    deactivate
+                                    AnnouncementRepo -> List: add(visitRequest)
+
+                                end
+                            end
+                        end
+                    end
+                    AnnouncementRepo -->controller : ListVisitRequest
+                deactivate
+                 controller -> mapper:toDto(ListVisitRequest)
+                    activate mapper
+
+                        mapper->ListDTO**:createDTO
+                        loop foreach object of the List
+                        mapper -> List : get(i)
+                        activate List
+                        List --> mapper : VisitRequest
+                        deactivate List
+
+                        mapper -> mapper : toDto(VisitRequest)
+                        activate mapper
+                        mapper-> DTO** : create(VisitRequest)
+                        deactivate
+                        mapper --> ListDTO : add(VisitRequestDTO)
+                        activate ListDTO
+                        deactivate
+
+                        end
+
+
+
+                        mapper --> controller : ListVisitRequestDTO
+                        deactivate
+                        controller -> controller: sortComboVisitItemsByDate();
+
+
+        controller-->UI : ListVisitRequestDTO
+        deactivate
+
+UI --> actor: shows a Visit Requests list and asks to select one
+deactivate UI
+
+actor -> UI : selects a visit request
+activate UI
+        UI->controller : getClassificationList()
+        activate controller
+                    controller->opinion : getClassificationList()
+                    activate opinion
+                    opinion-->controller : ClassificationList
+                    deactivate
+
+        controller-->UI: ClassificationList
+        deactivate
+UI --> actor: shows a Classification list and asks to select one
+deactivate UI
+
+actor -> UI : selects a Classification
+
+activate UI
+UI --> actor: requests a Visit Request Opinion
+deactivate
+actor -> UI : types the opinion and submit
+activate UI
+    UI->controller: setVisitRequest(opinion,classification,\nvisitRequest)
+        activate controller
+            controller-> controller:isOpinionLenght()
+            alt isOpinionLenght==true
+
+
+
+                    controller->mapper: fromDTO(visitRequestDTO)
+                                    activate mapper
+                                    mapper->visit:create(VisitRequestDTO)
+                                    activate visit
+                                    visit-->mapper: (VisitRequest)
+                                    deactivate
+                                    mapper-->controller:visitRequest
+                                    deactivate
+
+                    controller -> visit:create(opinion,classification)
+                    activate visit
+                    visit -> opinion : create(opinion,classification)
+                    activate opinion
+                    deactivate
+                    visit->visit:addVisitRequestOpinion(visitRequestOpinion)
+                    visit->controller:success
+                    deactivate
+                    controller-->UI:success message
+
+                    UI --> actor: shows a success message
+
+            else
+            controller-->UI:insuccess message
+            deactivate controller
+
+            UI --> actor: shows an insuccess message
+            deactivate
+            end
+
+
+deactivate UI
+
+
+
+@enduml

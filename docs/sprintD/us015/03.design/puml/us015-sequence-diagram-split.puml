@@ -1,0 +1,75 @@
+@startuml
+skinparam monochrome true
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+autonumber
+
+actor "Agent" as agent
+participant ": ListVisitRequestUI" as UI
+participant ": AnnouncementController" as CTRL
+participant ":AnnouncementController" as CTRL
+participant ":Repositories" as REPO
+participant "repositories:\nRepositories" as rep
+
+
+
+activate agent
+agent -> UI : asks to list all booking requests for properties
+activate UI
+UI->CTRL**:create()
+UI--> agent: requests a beginning date
+deactivate
+
+agent->UI: select a beginning date
+activate UI
+
+UI-->agent: requests an ending date
+deactivate
+agent->UI: select a ending date
+
+activate UI
+    UI -> CTRL : getVisitRequestListForAgent (startDate,endDate)
+                activate CTRL
+                    ref over CTRL
+                        Get Agent email
+                    end
+
+                    CTRL -> REPO: getInstance()
+                      activate REPO
+
+                    REPO --> CTRL : Repositories
+                    deactivate REPO
+
+                    CTRL -> rep: getAnnouncementRepository()
+                                activate rep
+
+                    rep --> CTRL : AnnouncementRepository
+                    deactivate rep
+
+                    ref over CTRL
+                        Get list of visit Requests for the agent
+                    end
+
+
+
+                ref over CTRL
+                    Convert list to listDTO
+                end
+
+
+                CTRL --> UI : ListOfRequestsDTO
+                deactivate CTRL
+
+UI-->agent: Shows the list of booking requests \nsorted by recent
+
+
+
+
+
+
+
+
+
+
+@enduml

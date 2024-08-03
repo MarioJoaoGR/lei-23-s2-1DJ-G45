@@ -1,0 +1,65 @@
+@startuml
+'skinparam monochrome true
+skinparam packageStyle rectangle
+skinparam shadowing false
+skinparam linetype polyline
+'skinparam linetype orto
+
+skinparam classAttributeIconSize 0
+
+'left to right direction
+
+class "RegisterUserController" as ctrl{
+    +RegisterUser(name,email,password)
+
+
+
+}
+
+class UserRepository {
+    +isAccountAlreadyRegistered(userEmail)
+    +addUser(name,email,password)
+    +validateUser(user)
+}
+
+
+
+
+class User {
+    -String name
+    -String email
+    -String password
+
+    +User(name,email,password)
+
+}
+
+class RegisterUserIU {
+}
+
+class Repositories {
+    - Repositories()
+    + getInstance() : Repositories
+    + getUserRepository()
+}
+
+class "Unregistered user" as UU {
+
+
+}
+
+
+RegisterUserIU .> ctrl
+
+ctrl .> UserRepository
+ctrl .-> Repositories
+ctrl .-> User
+
+
+Repositories -> Repositories : instance
+
+UserRepository --> User : User
+
+UU --> User  : become an
+
+@enduml
